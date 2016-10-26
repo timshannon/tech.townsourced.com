@@ -1,0 +1,11 @@
+{
+	"contentdir": "content",
+	"layoutdir": "layouts",
+	"publishdir": "public",
+	"indexes": {
+		"category": "categories"
+	},
+	"baseurl": "https://tech.townsourced.com",
+	"title": "Townsourced Tech Blog",
+	"canonifyurls": true
+}
