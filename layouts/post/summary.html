@@ -1,0 +1,14 @@
+<section class="section">
+	<div class="section-inner">
+			<h2 class="heading title"><a href="{{.Permalink}}">{{ .Title }}</a></h2>
+			<div class="content">
+			 {{ .Summary }}
+
+			 {{ if .Truncated }}
+					<div class="more-link">
+						<a href="{{ .RelPermalink }}">Read More <i class="fa fa-long-arrow-right"></i></a>
+					</div>
+				{{ end }}
+			</div><!--//content-->
+	</div><!--//section-inner-->                 
+</section>

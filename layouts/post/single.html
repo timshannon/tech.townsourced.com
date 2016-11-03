@@ -6,18 +6,17 @@
     <div class="container sections-wrapper">
         <div class="row">
             <div class="primary col-md-8 col-sm-12 col-xs-12">
-
 								<section class="section">
                     <div class="section-inner">
-                        <h2 class="heading">404 Not Found!</h2>
+                        <h2 class="heading">{{.Title}}</h2>
                         <div class="content">
-                         
-                        </div><!--//content-->
+													{{ .Content }}
+												</div><!--//content-->
                     </div><!--//section-inner-->                 
 									</section>
                 
             </div><!--//primary-->
-						{{ partial "sidebar.html" }}
+						{{ partial "sidebar.html" . }}
 					</div><!--//row-->
     </div>
 	{{ partial "footer.html" }}    

@@ -1,0 +1,77 @@
+<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota, US</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div><!--//content-->  
+				</div><!--//section-inner-->                 
+		</aside><!--//aside-->
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						{{ range $name, $taxonomy := .Site.Taxonomies.categories }}
+							<li>
+								<a href="/categories/{{ $name | urlize }}">{{$name}}</a>
+							</li>
+						{{end}}
+					</ul>
+					<hr>
+					<ul class="list-inline">
+						{{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+							<li>
+								<a href="/tags/{{ $name | urlize }}">
+									<span class="label label-theme">#{{$name}}</span>
+								</a>
+							</li>
+						{{end}}
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">A frontend on a BoltDB for encoding, storing and querying Go Types.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div><!--//content-->  
+				</div><!--//section-inner-->                 
+		</aside><!--//section-->
+</div>
