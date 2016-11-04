@@ -387,17 +387,90 @@ iframe {
 }
 
 #homeLink {
-	background-color: #3AAA64;
+	background-color: #3aaa64;
 }
 
 #homeLink:hover {
 	background-color: #2d844e;
 }
 
-.section .heading.title a {
-  color: #778492;
-}
-.section .heading.title a:hover {
-  color: #5f6b77;
+.section .heading.title {
+  color: #49515a;
 }
 
+.section .heading.title > a {
+  color: #49515a;
+}
+.section .heading.title > a:hover {
+  color: #778492;
+}
+
+/* Post Summary */
+
+.section.post-summary {
+	position: relative;
+	padding-left: 90px;
+}
+
+.post-summary .date {
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	background: #3AAA64;
+	color: #fff;
+	text-align: center;
+	padding: 5px 20px;
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
+.post-summary .date ul {
+	margin-bottom: 0;
+}
+
+.post-summary .date .day {
+	font-size: 32px;
+	font-weight: bold;
+	line-height: 1;
+}
+
+.post-summary .date .month {
+	font-size: 18px;
+}
+
+.post-summary .date .year {
+	font-size: 12px;
+}
+
+.post-meta {
+  color: #778492;
+  font-size: 12px;
+  font-weight: normal;
+  margin-top: 10px;
+}
+
+.content-footer {
+  color: #778492;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.post-meta a {
+  color: #778492;
+}
+
+.tags > li {
+	padding: 0;
+}
+
+/* pagination */
+.pagination > li > a, .pagination > li > span {
+	  color: #2d844e;
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    color: #fff;
+    background-color: #2d844e;
+    border-color: #2d844e;
+}

@@ -4,11 +4,7 @@
 
 {{with .Description }}<meta name="description" content="{{ . }}">{{end}}
 
-{{if .Params.author }}
-	<meta name="author" content="{{.Params.author}} at solutions.townsourced.com">    
-{{else}}
-	<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
-{{end}}
+<meta name="author" content="{{.Params.author | default .Site.Params.author}} at solutions.townsourced.com">    
 
 <meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,{{ if .Keywords }}{{ range .Keywords }}{{ . }}, {{ end }}{{else if isset .Params "tags" }}{{ range .Params.tags }}{{ . }}, {{ end }}{{end}}">
 

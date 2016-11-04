@@ -4,11 +4,11 @@
 	"date": "2016-11-03",
 	"tags": [ ".vimrc", "plugins", "spf13-vim", "vim" ],
 	"categories": [
-	  "Development",
-	  "VIM"
+	  "Development"
 	],
 	"slug": "test-post",
-	"draft": false
+	"draft": false,
+	"author": "Tim Shannon"
 }
 
 With lots of test content.

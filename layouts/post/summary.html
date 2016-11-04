@@ -1,7 +1,18 @@
-<section class="section">
+<section class="section post-summary">
 	<div class="section-inner">
-			<h2 class="heading title"><a href="{{.Permalink}}">{{ .Title }}</a></h2>
-			<div class="content">
+			<h2 class="heading title"><a href="{{.Permalink}}">{{ .Title }}</a>
+				<div class="post-meta">
+					<ul class="list-inline">
+						<li class="author" title="Author"><i class="fa fa-user"></i> {{.Params.author | default .Site.Params.author}}</li>
+						<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> {{.ReadingTime}} min</li>
+						<li class="comments"><i class="fa fa-comments"></i>
+							<a href="{{.Permalink}}#disqus_thread">0 comments</a>
+						</li>
+					</ul>
+				</div>
+			</h2>
+			{{partial "date.html" . }}
+					<div class="content">
 			 {{ .Summary }}
 
 			 {{ if .Truncated }}

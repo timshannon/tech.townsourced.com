@@ -6,12 +6,49 @@
     <div class="container sections-wrapper">
         <div class="row">
             <div class="primary col-md-8 col-sm-12 col-xs-12">
-								<section class="section">
+								<section class="section post">
                     <div class="section-inner">
-                        <h2 class="heading">{{.Title}}</h2>
+                        <h2 class="heading title">{{.Title}}
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> {{.Date.Format "Monday, Jan 2, 2006"}}</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	{{.Params.author | default .Site.Params.author}}</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> {{.ReadingTime}} min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="{{.Permalink}}#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
                         <div class="content">
 													{{ .Content }}
 												</div><!--//content-->
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															{{ range .Params.categories }}
+																<span>
+																	<a href="/tags/{{ . | urlize }}">
+																		<a href="/categories/{{ . | urlize }}">{{.}}</a>
+																	</a>
+																</span>
+															{{end}}
+													</span>
+
+													<ul class="list-inline tags text-right">
+														{{ range .Params.tags }}
+															<li>
+																<a href="/tags/{{ . | urlize }}">
+																	<span class="label label-theme">#{{.}}</span>
+																</a>
+															</li>
+														{{end}}
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													{{ template "_internal/disqus.html" . }}
+												</div>
                     </div><!--//section-inner-->                 
 									</section>
                 
@@ -20,5 +57,10 @@
 					</div><!--//row-->
     </div>
 	{{ partial "footer.html" }}    
+
+	<script type="text/javascript">
+		// needed because in-page comment count doesn't seem to update correctly
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
 </body>
 </html> 

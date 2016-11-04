@@ -6,9 +6,14 @@
     <div class="container sections-wrapper">
         <div class="row">
             <div class="primary col-md-8 col-sm-12 col-xs-12">
-							{{ range first 10 .Data.Pages.ByDate }}
+							{{ $paginator := .Paginate (where .Data.Pages "Type" "post") }}
+							{{ range $paginator.Pages }}
 									{{ .Render "summary"}}
 							{{ end }}
+							<div class="text-center">
+								{{ template "_internal/pagination.html" . }}
+							</div>
+
             </div><!--//primary-->
 
 						{{ partial "sidebar.html" . }}
