@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Post-rsses on Townsourced Tech Blog</title>
+    <link>https://tech.townsourced.com/post/index.xml</link>
+    <description>Recent content in Post-rsses on Townsourced Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 04 Nov 2016 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://tech.townsourced.com/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Test Html Post</title>
+      <link>https://tech.townsourced.com/post/test-html-post/</link>
+      <pubDate>Fri, 04 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://tech.townsourced.com/post/test-html-post/</guid>
+      <description>&lt;p&gt;
+This content is written in html directly as a test.
+&lt;p&gt;
+&lt;p&gt;
+It has several paragraphs and an image
+&lt;/p&gt;
+&lt;!--more--&gt;
+&lt;img src=&#34;https://solutions.townsourced.com/assets/images/team/tim.jpg&#34;&gt;
+&lt;ul&gt;
+	&lt;li&gt;list item&lt;/li&gt;
+	&lt;li&gt;list item&lt;/li&gt;
+	&lt;li&gt;list item&lt;/li&gt;
+	&lt;li&gt;list item&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Test Post</title>
+      <link>https://tech.townsourced.com/post/test-post/</link>
+      <pubDate>Thu, 03 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://tech.townsourced.com/post/test-post/</guid>
+      <description>&lt;p&gt;With lots of test content.
+And some lists here:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;first&lt;/li&gt;
+&lt;li&gt;second&lt;/li&gt;
+&lt;li&gt;3rd&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>new post</title>
+      <link>https://tech.townsourced.com/post/newpost/</link>
+      <pubDate>Thu, 27 Oct 2016 16:21:11 -0500</pubDate>
+      
+      <guid>https://tech.townsourced.com/post/newpost/</guid>
+      <description>&lt;p&gt;New Post with new stuff&lt;/p&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sed dui neque. Maecenas dignissim non ex nec auctor. In semper nisl ex, nec tristique felis ornare ut. Pellentesque massa ligula, tempus sit amet magna vitae, efficitur auctor sapien. In non viverra metus. Phasellus suscipit enim massa, eu luctus nibh lacinia quis. Aliquam laoreet mi augue, a sollicitudin nibh accumsan a. Duis eget posuere massa, vel condimentum magna. Aenean molestie convallis urna.&lt;/p&gt;
+
+&lt;p&gt;Ut sed ornare quam. Vestibulum eget felis ut nisl pulvinar vestibulum at eget nunc. Etiam fringilla mi odio, dapibus porttitor est consectetur venenatis. Cras quis vulputate urna, mattis tristique est. Etiam interdum velit augue, ut tincidunt arcu faucibus pretium. Nunc orci velit, maximus in augue et, molestie pulvinar justo. Morbi iaculis metus et aliquet tempus. Ut gravida euismod nulla, in laoreet neque consequat ac. Morbi eleifend, turpis quis egestas congue, risus leo malesuada diam, eu faucibus ex lectus a lectus. Donec molestie ex ac magna laoreet ornare. Proin consectetur tempor dolor, vulputate egestas erat euismod molestie. In euismod et ipsum id fringilla. Nunc ultricies, neque non consequat tincidunt, dolor mauris pretium nibh, vitae volutpat ligula magna nec nisi. Sed malesuada semper vulputate. Phasellus nec hendrerit neque, accumsan hendrerit lacus. In massa mi, porta rhoncus purus sit amet, viverra facilisis tortor.&lt;/p&gt;
+
+&lt;p&gt;Aenean vitae tortor aliquet elit commodo rutrum. Ut nec tortor diam. Vivamus orci diam, placerat condimentum sem sed, mollis dictum elit. Vivamus scelerisque dignissim ipsum in cursus. Aliquam feugiat ex in arcu dignissim congue. Donec venenatis, mi ac euismod mattis, dui lorem feugiat mi, eu volutpat sapien nibh sed nisi. Morbi cursus diam et semper tempus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi scelerisque scelerisque quam in condimentum. Suspendisse et erat non urna sodales bibendum vitae id dui. Vestibulum tincidunt diam a enim mollis, vel viverra nisl interdum. Nam vel arcu nec erat venenatis laoreet fringilla quis mi. Proin et consequat ex. Nunc vitae nisl sit amet purus tincidunt porttitor in vitae libero. Nunc volutpat sagittis massa sit amet pulvinar. Aliquam erat volutpat.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
