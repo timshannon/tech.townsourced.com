@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Townsourced Tech Blog</title>
-    <link>https://tech.townsourced.com/categories/projects/index.xml</link>
+    <link>http://tech.townsourced.com/categories/projects/index.xml</link>
     <description>Recent content on Townsourced Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
-    <atom:link href="https://tech.townsourced.com/categories/projects/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://tech.townsourced.com/categories/projects/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>new post</title>
-      <link>https://tech.townsourced.com/post/newpost/</link>
+      <link>http://tech.townsourced.com/post/newpost/</link>
       <pubDate>Thu, 27 Oct 2016 16:21:11 -0500</pubDate>
       
-      <guid>https://tech.townsourced.com/post/newpost/</guid>
+      <guid>http://tech.townsourced.com/post/newpost/</guid>
       <description>&lt;p&gt;New Post with new stuff&lt;/p&gt;
 
 &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sed dui neque. Maecenas dignissim non ex nec auctor. In semper nisl ex, nec tristique felis ornare ut. Pellentesque massa ligula, tempus sit amet magna vitae, efficitur auctor sapien. In non viverra metus. Phasellus suscipit enim massa, eu luctus nibh lacinia quis. Aliquam laoreet mi augue, a sollicitudin nibh accumsan a. Duis eget posuere massa, vel condimentum magna. Aenean molestie convallis urna.&lt;/p&gt;
