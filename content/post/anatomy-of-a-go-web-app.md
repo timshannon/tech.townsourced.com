@@ -7,30 +7,88 @@ tags = ["Go", "Web Development", "tutorial", "reference"]
 
 +++
 
-When building a web application from scratch, there are a lot of decisions to make.  The goal of this post is to give 
+When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give 
 one more example of how you can go about building a web application in the Go language, as well as to give you and idea 
 what things you need to start thinking about and plan for before you get started.
 
-This guide is not intended to exhaustive nor absolute. It is a compendium of the things I thought about and how I dealt 
-with them when building [townsourced.com](https://www.townsourced.com).
-
+This guide is not intended to exhaustive, nor is it absolute. It is a compendium of the things I thought about and how I dealt 
+with them when building [townsourced.com](https://www.townsourced.com).  Hopefully you'll find some of it useful.
 
 # Package Layout and Code Organization
 
 Clean separation of duties, and clear code boundaries are crucial to figure out when building large applications.  I've
 found, with web applications, these the 3 package delineations are required:
 
-* web
-* app
-* data
+* [web](#the-web-package)
+* [app](#the-app-package)
+* [data](#the-data-package)
 
-There may be other packages, but for the most part your code will fall into one of these 3 packages, or sub-packages 
+There may be others, but for the most part your code will fall into one of these 3 packages, or sub-packages 
 within them.
+
+But before we get into packages, we need to setup the main entry point to our program.  In Go, this means `func main()`
+and I usually put mine in `main.go`.
+
+## main.go
+
+`main.go` will be responsible for loading anything configurable in your web app and passing those configuration options
+into the other layers.  There are many different options for storing your app's configuration, personally I store mine 
+in json files using [small configuration library](https://github.com/timshannon/config) I wrote.  If you want many options
+including environment variables, TOML, YAML, or JSON , check out  Steve Francia's excellent [Viper library](https://github.com/spf13/viper).
+
+Below is an example of townsourced's config file to give you an idea of the types of options you may put in there:
+
+```javascript
+{
+    "app": {
+        "httpClientTimeout": "30s", 
+        "taskPollTime": "1m",
+        "taskQueueSize": 100
+    },
+    "data": {
+        "cache": { // memcached servers
+            "addresses": [
+                "127.0.0.1:11211"
+            ]
+        },
+        "db": { // RethinkDB 
+            "address": "127.0.0.1:28015",
+            "database": "townsourced",
+            "timeout": "60s"
+        },
+        "search": {  // ElasticSearch
+            "addresses": [
+                "http://127.0.0.1:9200"
+            ],
+            "index": {
+                "name": "townsourced",
+                "replicas": 1,
+                "shards": 5
+            },
+            "maxRetries": 0
+        }
+    },
+    "web": {
+        "address": "http://localhost:8080",
+        "certFile": "", 
+        "keyFile": "",
+        "maxHeaderBytes": 0,
+        "maxUploadMemoryMB": 10,
+        "minTLSVersion": 769,
+        "readTimeout": "60s",
+        "writeTimeout": "60s"
+    }
+}
+```
+
+This configuration will usually be defined as separate structs in each package: `web.Config`, `app.Config`, and `data.Config`.
+You'll then load the configuration into these structs, and pass them into their respective packages. This is also a good 
+time to initialize any clients in those packages as well.
 
 ## The Web Package
 
-The **web** package is the entry point to your application.  Here you will extensively use the [http package](https://golang.org/pkg/net/http/) 
-and (for REST APIs) the [encoding/json package](https://golang.org/pkg/encoding/json").
+The **web** package is the client's entry point to your application.  Here you will extensively use the [http package](https://golang.org/pkg/net/http/) 
+and the [encoding/json package](https://golang.org/pkg/encoding/json") for any REST APIs.
 
 You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
 package and it's types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
@@ -60,8 +118,10 @@ with other types rather than from stand alone functions.
 	}
 ```
 
-If stand alone functions are necessary or make more sense (for instance when they don't actually modify any types), then 
+If standalone functions are necessary or make more sense (for instance when they don't actually modify any types), then 
 don't export them.
+
+## The Data Package
 
 ---
 
@@ -78,3 +138,4 @@ don't export them.
  * Private data like API Keys
  * Templates and static data handling in Development environments
 
+* main.go entry point, config files
