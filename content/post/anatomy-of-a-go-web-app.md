@@ -98,30 +98,67 @@ other packages will help keep clear lines of responsibility between your package
 ## The App Package
 
 The **app** package is where the meat of your application will be.  Inside this package you'll define exported types
-that will be passed to and from your other packages; types like app.User and app.Session.  The point of the app package
+that will be passed to and from your other packages; types like `app.User` and `app.Session`.  The point of the app package
 is to validate and handle data within these types, so most of your code in the app package will be methods on types, or
 functions that return these types. Be conservative about which types and methods you choose to export.  The web package
-doesn't need to understand how an *app.User* is approved to see data, it just needs to know if they can or not.
+doesn't need to understand how an `app.User` is approved to see data, it just needs to know if they can or not.
 
 More likely than not your application data will be related to each other.  Try to retrieve types from their relationship
 with other types rather than from stand alone functions.
 
 ```Go
+	//  instead of this
+	func UserFromSession(s *Session) (*User, error) {
+
+	}
+
+	// do this
 	func(s *Session) User() (*User, error){
 
 	}
 
-	//  instead of
-
-	func UserFromSession(s *Session) (*User, error) {
-
-	}
 ```
 
 If standalone functions are necessary or make more sense (for instance when they don't actually modify any types), then 
 don't export them.
 
+If you aren't careful you may find yourself implementing parts of your application in the web or data layers when they
+should be in the app layer.  For example, access controls.
+
+You may be tempted to check if a user has access at the web layer, but this type of access control should always be done
+at the app layer, where it can be easily unit tested.  
+
+```Go
+// instead of this
+
+package web
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	if currentUser.Equal(userBeingViewed) {
+		profile, err := userBeingViewed.Profile()
+	}
+}
+
+// do this
+
+package app
+
+func (u *User) Profile(who *User) (*ProfileData, error) {
+	if !u.equal(who) {
+		return nil, errors.New("You do not have access to view this profile!")
+	}
+
+	return &ProfileData{}, nil
+}
+
+
+```
+
 ## The Data Package
+
+The data package is for getting and setting data in your persistent or temporary storage.  There shouldn't be any types
+kept here unless they are types that augment the data layer. 
+
 
 ---
 
@@ -138,4 +175,3 @@ don't export them.
  * Private data like API Keys
  * Templates and static data handling in Development environments
 
-* main.go entry point, config files
