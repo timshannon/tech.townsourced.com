@@ -1,7 +1,7 @@
 +++
 title = "Anatomy of a Go Web Application"
 draft = true
-date = "2016-11-07T16:53:07-06:00"
+date = "2016-11-16T16:53:07-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference"]
 
@@ -12,7 +12,9 @@ one more example of how you can go about building a web application in the Go la
 what things you need to start thinking about and plan for before you get started.
 
 This guide is not intended to exhaustive, nor is it absolute. It is a compendium of the things I thought about and how I dealt 
-with them when building [townsourced.com](https://www.townsourced.com).  Hopefully you'll find some of it useful.
+with them when building [townsourced.com](https://www.townsourced.com).  Hopefully you'll find it useful.
+
+<!--more-->
 
 # Package Layout and Code Organization
 
@@ -83,7 +85,85 @@ Below is an example of townsourced's config file to give you an idea of the type
 
 This configuration will usually be defined as separate structs in each package: `web.Config`, `app.Config`, and `data.Config`.
 You'll then load the configuration into these structs, and pass them into their respective packages. This is also a good 
-time to initialize any clients in those packages as well.
+time to initialize any clients in those packages as well.  In Townsourced, this looks like the following:
+
+```Go
+package data
+
+type Config struct {
+	DB      DBConfig     `json:"db"`
+	Cache   CacheConfig  `json:"cache"`
+	Search  SearchConfig `json:"search"`
+}
+
+// DefaultConfig returns the default configuration for the data layer
+func DefaultConfig() *Config {
+	return &Config{
+		DB: DBConfig{
+			Address:  "127.0.0.1:28015",
+			Database: DatabaseName,
+			Timeout:  "60s",
+		},
+		Cache: CacheConfig{
+			Addresses: []string{"127.0.0.1:11211"},
+		},
+		Search: SearchConfig{
+			Addresses:  []string{"http://127.0.0.1:9200"},
+			MaxRetries: 0,
+			Index: SearchIndexConfig{
+				Name:     "townsourced",
+				Shards:   5,
+				Replicas: 1,
+			},
+		},
+	}
+}
+
+func Init(cfg *Config) error {
+	// initialize rethinkdb, memcached and elasticsearch clients based on passed in config
+}
+
+```
+
+Config is then loaded and passed into the `data` layer:
+
+```Go
+// main.go
+
+package main
+
+func main() {
+	...
+
+	settingPaths := config.StandardFileLocations("townsourced/settings.json")
+	cfg, err := config.LoadOrCreate(settingPaths...)
+	if err != nil {
+		app.Halt(err.Error())
+	}
+
+	...
+
+	dataCfg := data.DefaultConfig()
+
+	err = cfg.ValueToType("data", dataCfg)
+	if err != nil {
+		app.Halt("Error reading data config values: %s", err.Error())
+	}
+
+	err = cfg.Write()
+	if err != nil {
+		app.Halt("Error writting config file to %s. Error: %s", cfg.FileName(), err)
+	}
+
+	err = data.Init(dataCfg)
+	if err != nil {
+		log.Fatalf("Error initializing townsourced data layer: %s", err.Error())
+	}
+
+	...
+}
+
+```
 
 ## The Web Package
 
@@ -157,21 +237,189 @@ func (u *User) Profile(who *User) (*ProfileData, error) {
 ## The Data Package
 
 The data package is for getting and setting data in your persistent or temporary storage.  There shouldn't be any types
-kept here unless they are types that augment the data layer. 
+kept here unless they are types that augment the data layer.  For example, you shouldn't have a `User` or `Session`, but
+you may have a type called `UUID` that exists with the `app.User` or `app.Session` types.
 
+A specific example of this in [Townsourced](https://www.townsourced.com) is the `data.Version` type which looks like 
+this:
+
+```Go
+type Version struct {
+	VerTag  string   // Unique, random value identifying this version
+	Created time.Time // When this record was first created
+	Updated time.Time // when this record was last updated
+}
+```
+
+This Version type is then embedded in other types to easily track when objects are created and updated.
+
+```Go
+type User struct {
+	Username       data.Key        
+	Email          string         
+	...
+	data.Version
+}
+
+```
+
+The real usefulness of `data.Version`, and the reason it exists in the `data` package is it's ability to prevent any
+updates running in the data layer if the `vertag` being submitted by the user doesn't match the `vertag` in of the
+record in the database, preventing your users from updating an entry based on stale data.  
+
+In Townsourced, the code to determine when to invalidate and update *memcached* entries exists in the `data` layer, not
+the `app` layer.  The `app` layer shouldn't worry about how data is stored or retrieved, it should only concern itself 
+with the structure and behavior of it's types. 
+
+## Putting it all together
+
+At this point your web application should look like this:
+
+```
+webapp
+|--main.go
+|
+|--app
+|   |--user.go
+|   |--session.go
+|   |--whatever.go
+|   
+|--data
+|   |--data.go
+|   |--version.go
+|   
+|--web
+    |--server.go
+    |--json.go
+
+```
+
+* `main.go` imports `web`, `app`, and `data`
+* `web` imports `app` and `data`
+* `app` imports `data`
+
+# Error Handling
+
+Handling errors properly is important in any application, but especially so in web applications.  In web applications,
+errors tend to happen in one of two ways: the system broke, or the user broke the system.
+
+Conveniently http has already given us status codes to differentiate between the two types of errors:
+
+* Status 400 range - User Errors
+* Status 500 range - Server Errors
+
+If the user breaks the system by putting in bad input using the web application in a way that wasn't intended, they should
+be notified of the mistake with a clear explanation of what went wrong and how.  I refer to these errors as **Failures**.
+
+If the system breaks (due to network, hardware, or system design issues) the user should *not* be given any details.  
+Any information returned as to the cause of the error is a potential security issue where you may be leaking private
+details of your server architecture, configuration vulnerabilities, or specific library versions which could then be
+used to attack your application in a specific way.
+
+To help manage which errors should be visible to users and which shouldn't, I usually create a `fail` package, which
+resides outside the existing packages.  Inside the `fail` package is the `fail.Fail` type which implements the 
+`error` interface, so it can be returned like a normal error.
+
+```Go
+type Fail struct {
+	Message    string      `json:"message,omitempty"`
+	Data       interface{} `json:"data,omitempty"`
+	HTTPStatus int         `json:"-"` //gets set in the error response
+}
+
+func (f *Fail) Error() string {
+	return f.Message
+}
+
+// IsFail tests whether the passed in error is a failure
+func IsFail(err error) bool {
+	if err == nil {
+		return false
+	}
+	switch err.(type) {
+	case *Fail:
+		return true
+	default:
+		return false
+	}
+}
+
+```
+
+When errors bubble up to the `web` package, you can use a [type switch](https://golang.org/doc/effective_go.html#type_switch)
+to determine which are failures that can be shown to the user.
+
+```Go
+errMsg := ""
+
+switch err.(type) {
+case *fail.Fail:
+	errMsg = err.Error()
+case *http.ProtocolError, *json.SyntaxError, *json.UnmarshalTypeError:
+	//Hardcoded error types which can bubble up to the end users
+	// without exposing internal server information, make them behave like failures
+	err = fail.NewFromErr(err)
+	errMsg = fmt.Sprintf("We had trouble parsing your input, please check your input and try again: %s", err)
+default:
+	errMsg = "An internal server error has occurred"
+}
+
+```
+
+# Tips and Tricks
+
+## JSON Input
+
+When handling JSON input, such as for an API, be wary of Go's [zero values](https://golang.org/ref/spec#The_zero_value).
+In an API you need to be able to tell the difference between setting a value to a zero value, and not setting a value at 
+all. Consider the following scenario.  Let's say you have an API where the user can set their Name or the Email address,
+you may define that input like this:
+
+```Go
+type UserInput struct {
+	Email string
+	Name  string
+}
+```
+
+If a user just wants to update their Name and not their Email, they'll send some JSON like this:
+
+```Javascript
+{ Name: "New Name" }
+```
+
+Which when parsed, will result in `Name == "New Name"` and `Email == ""`.  You don't know if the user meant to set their
+email to `""` or if they simply didn't specify any change to their Email.
+
+You should instead define your input with pointers:
+
+```Go
+type UserInput struct {
+	Email *string
+	Name  *string
+}
+```
+
+This way you can check if Email was set to `""` or if it wasn't specified at all:
+```Go
+if input.Email != nil {
+	//update email
+}
+```
+
+Be careful to check each input though, so you don't run into any nil pointer panics.
+
+## Development
+
+When developing, you need to have immediate feedback to the changes you're making.  This means seeing the results of your
+work without having to restart your web server.
 
 ---
 
-* SQL vs NOSQL
-* Error Handling
- * Errors 5xx vs Failures 4xx
 * Other
-* JSON Handling
-  * Pointers in inputs / nil input
 * Templates
 * Gzip data
 * Tips and Tricks
  * pooling gzip and json readers and writers
  * Private data like API Keys
- * Templates and static data handling in Development environments
 
