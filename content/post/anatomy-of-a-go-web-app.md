@@ -412,14 +412,25 @@ Be careful to check each input though, so you don't run into any nil pointer pan
 ## Development
 
 When developing, you need to have immediate feedback to the changes you're making.  This means seeing the results of your
-work without having to restart your web server.
+work without having to restart your web server.  For this reason it's important to create a *dev mode* in your application
+that can be turned on via a command line flag, or environment variable.  Once set you can use this variable to rebuild
+templates on every request, reload files on every request, watch for file changes and auto-reload the web page. You'd
+be surprised how much your productivity can suffer with a long write and evaluate loop.  In my opinion it's worth spending
+time getting this working as soon as possible.
 
----
+```Go
+func (t templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if devMode || t.template == nil {
+		t.loadTemplates()
+	}
+}
+```
 
-* Other
-* Templates
-* Gzip data
-* Tips and Tricks
- * pooling gzip and json readers and writers
- * Private data like API Keys
+## sync.Pool
+
+Which each connection coming in on it's own separate go-routine, the easiest way to write you code is create and destroy
+everything you need in that go-routine.  This will work for a while, but eventually, if your requests start increasing
+you'll start running into issues with garbage collection.  Most of the time, the answer to that problem is `sync.Pool`.
+
+For example, if you want to gzip every response, your first pass may have to creating a new gzip writer
 
