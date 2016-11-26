@@ -432,5 +432,70 @@ Which each connection coming in on it's own separate go-routine, the easiest way
 everything you need in that go-routine.  This will work for a while, but eventually, if your requests start increasing
 you'll start running into issues with garbage collection.  Most of the time, the answer to that problem is `sync.Pool`.
 
-For example, if you want to gzip every response, your first pass may have to creating a new gzip writer
+For example, if you want to gzip every response, your first pass may have to creating a new gzip writer on every request.
+If your server gets a huge spike in traffic, then your server will be spending a lot of time reclaiming unused gzip writers
+when things start to die down.  
+
+Instead, use `sync.Pool` to instantiate your gzip writers, and when you're done with them, put them back in the pool to
+be reused, instead of garbage collected.
+
+```Go
+func init() {
+	zipPool = sync.Pool{
+		New: func() interface{} {
+			return gzip.NewWriter(nil)
+		},
+	}
+}
+
+...
+
+// custom response writer
+type gzipResponse struct {
+	zip *gzip.Writer
+	http.ResponseWriter
+}
+
+func (g *gzipResponse) Write(b []byte) (int, error) {
+	if g.zip == nil {
+		return g.ResponseWriter.Write(b)
+	}
+	return g.zip.Write(b)
+}
+
+// http server calls Close() on the responseWriter
+// return the gzip writer to the pool
+func (g *gzipResponse) Close() error {
+	if g.zip == nil {
+		return nil
+	}
+	err := g.zip.Close()
+	if err != nil {
+		return err
+	}
+	zipPool.Put(g.zip)
+	return nil
+}
+
+func responseWriter(w http.ResponseWriter, r *http.Request) *gzipResponse {
+	var writer *gzip.Writer
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := zipPool.Get().(*gzip.Writer)
+		gz.Reset(w)
+		writer = gz
+	}
+	return &gzipResponse{zip: writer, ResponseWriter: w}
+}
+```
+
+# Conclusion
+
+As you can see from the length of this post, there are a lot of things to consider when building a web application, and
+I've only just scratched the surface of the topic.  Hopefully this post can act as a foundation to start from, as well 
+as a base to refer to in future posts about more specific aspects of web application development in Go.
+
+I hope you find this post useful, and if you have any corrections, questions, or suggestions for future posts, let me 
+know in the comments below.
+
 
