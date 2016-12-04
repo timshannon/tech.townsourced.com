@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+  
+  
+ <html lang="en">   
+<head>
+
+    <title>Anatomy of a Go Web Application</title>
+
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
+
+<meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,Go, Web Development, tutorial, reference, ">
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content=""/>
+<meta property="og:title" content="Anatomy of a Go Web Application : tech.townsourced.com"/>
+<meta property="og:site_name" content="Townsourced Tech Blog"/>
+
+<meta property="og:url" content="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-12-04"/>
+<meta property="article:modified_time" content="2016-12-04"/>
+
+
+
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Web Development">
+<meta property="article:tag" content="tutorial">
+<meta property="article:tag" content="reference">
+
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@townsourced">
+<meta name="twitter:title" content="Anatomy of a Go Web Application : tech.townsourced.com">
+<meta name="twitter:creator" content="@shannontimothy">
+<meta name="twitter:description" content="">
+
+<meta name="twitter:domain" content="townsourced.com">
+
+
+
+    <link rel="canonical" href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/">
+		<link href="" rel="alternate" type="application/rss+xml" title="Townsourced Tech Blog" />
+
+    <link rel="shortcut icon" href="http://tech.townsourced.com/favicon.ico">  
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/main.css">
+
+    
+    
+    
+</head> 
+
+
+<body>
+   
+	  
+<header class="header">
+		<div class="container">                       
+				<div class="profile-content pull-left">
+						<h1 class="name">Townsourced Tech Blog</h1>
+						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
+						<ul class="social list-inline">
+								<li><a id="homeLink" href="http://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
+								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
+								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
+								<li class="last-item"><a href="http://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+						</ul> 
+				</div>
+		</div>
+</header>
+    
+
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-md-8 col-sm-12 col-xs-12">
+								<section class="section post">
+                    <div class="section-inner">
+                        <h2 class="heading title">Anatomy of a Go Web Application
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> Sunday, Dec 4, 2016</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 12 min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
+                        <div class="content">
+													<p>When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give
+one more example of how you can go about building a web application in the Go language, as well as to give you and idea
+what things you need to start thinking about and plan for before you get started.</p>
+
+<p>This guide is not intended to exhaustive, nor is it absolute. It is a compendium of the things I thought about and how I dealt
+with them when building <a href="https://www.townsourced.com">townsourced.com</a>.  Hopefully you&rsquo;ll find it useful.</p>
+
+<p></p>
+
+<h1 id="package-layout-and-code-organization">Package Layout and Code Organization</h1>
+
+<p>Clean separation of duties, and clear code boundaries are crucial to figure out when building large applications.  I&rsquo;ve
+found, with web applications, these the 3 package delineations are required:</p>
+
+<ul>
+<li><a href="#the-web-package">web</a></li>
+<li><a href="#the-app-package">app</a></li>
+<li><a href="#the-data-package">data</a></li>
+</ul>
+
+<p>There may be others, but for the most part your code will fall into one of these 3 packages, or sub-packages
+within them.</p>
+
+<p>But, before we get into packages, we need to setup the main entry point to our program.  In Go, this means <code>func main()</code>
+and I usually put mine in <code>main.go</code>.</p>
+
+<h2 id="main-go">main.go</h2>
+
+<p><code>main.go</code> will be responsible for loading anything configurable in your web app and passing those configuration options
+into the other layers.  There are many different options for storing your app&rsquo;s configuration, personally I store mine
+in json files using <a href="https://github.com/timshannon/config">small configuration library</a> I wrote.  If you want many options
+including environment variables, TOML, YAML, or JSON , check out  Steve Francia&rsquo;s excellent <a href="https://github.com/spf13/viper">Viper library</a>.</p>
+
+<p>Below is an example of townsourced&rsquo;s config file to give you an idea of the types of options you may put in there:</p>
+
+<pre><code class="language-javascript">{
+    &quot;app&quot;: {
+        &quot;httpClientTimeout&quot;: &quot;30s&quot;, 
+        &quot;taskPollTime&quot;: &quot;1m&quot;,
+        &quot;taskQueueSize&quot;: 100
+    },
+    &quot;data&quot;: {
+        &quot;cache&quot;: { // memcached servers
+            &quot;addresses&quot;: [
+                &quot;127.0.0.1:11211&quot;
+            ]
+        },
+        &quot;db&quot;: { // RethinkDB 
+            &quot;address&quot;: &quot;127.0.0.1:28015&quot;,
+            &quot;database&quot;: &quot;townsourced&quot;,
+            &quot;timeout&quot;: &quot;60s&quot;
+        },
+        &quot;search&quot;: {  // ElasticSearch
+            &quot;addresses&quot;: [
+                &quot;http://127.0.0.1:9200&quot;
+            ],
+            &quot;index&quot;: {
+                &quot;name&quot;: &quot;townsourced&quot;,
+                &quot;replicas&quot;: 1,
+                &quot;shards&quot;: 5
+            },
+            &quot;maxRetries&quot;: 0
+        }
+    },
+    &quot;web&quot;: {
+        &quot;address&quot;: &quot;http://localhost:8080&quot;,
+        &quot;certFile&quot;: &quot;&quot;, 
+        &quot;keyFile&quot;: &quot;&quot;,
+        &quot;maxHeaderBytes&quot;: 0,
+        &quot;maxUploadMemoryMB&quot;: 10,
+        &quot;minTLSVersion&quot;: 769,
+        &quot;readTimeout&quot;: &quot;60s&quot;,
+        &quot;writeTimeout&quot;: &quot;60s&quot;
+    }
+}
+</code></pre>
+
+<p>I defined this configuration as separate structs in each package: <code>web.Config</code>, <code>app.Config</code>, and <code>data.Config</code>.
+You&rsquo;ll then load the configuration into these structs, and pass them into their respective packages. This is also a good
+time to initialize any clients in those packages as well.  In Townsourced, this looks like the following:</p>
+
+<pre><code class="language-Go">package data
+
+type Config struct {
+	DB      DBConfig     `json:&quot;db&quot;`
+	Cache   CacheConfig  `json:&quot;cache&quot;`
+	Search  SearchConfig `json:&quot;search&quot;`
+}
+
+// DefaultConfig returns the default configuration for the data layer
+func DefaultConfig() *Config {
+	return &amp;Config{
+		DB: DBConfig{
+			Address:  &quot;127.0.0.1:28015&quot;,
+			Database: DatabaseName,
+			Timeout:  &quot;60s&quot;,
+		},
+		Cache: CacheConfig{
+			Addresses: []string{&quot;127.0.0.1:11211&quot;},
+		},
+		Search: SearchConfig{
+			Addresses:  []string{&quot;http://127.0.0.1:9200&quot;},
+			MaxRetries: 0,
+			Index: SearchIndexConfig{
+				Name:     &quot;townsourced&quot;,
+				Shards:   5,
+				Replicas: 1,
+			},
+		},
+	}
+}
+
+func Init(cfg *Config) error {
+	// initialize rethinkdb, memcached and elasticsearch clients based on passed in config
+}
+
+</code></pre>
+
+<p>Config is then loaded and passed into the <code>data</code> layer:</p>
+
+<pre><code class="language-Go">// main.go
+
+package main
+
+func main() {
+	...
+
+	settingPaths := config.StandardFileLocations(&quot;townsourced/settings.json&quot;)
+	cfg, err := config.LoadOrCreate(settingPaths...)
+	if err != nil {
+		app.Halt(err.Error())
+	}
+
+	...
+
+	dataCfg := data.DefaultConfig()
+
+	err = cfg.ValueToType(&quot;data&quot;, dataCfg)
+	if err != nil {
+		app.Halt(&quot;Error reading data config values: %s&quot;, err.Error())
+	}
+
+	err = cfg.Write()
+	if err != nil {
+		app.Halt(&quot;Error writing config file to %s. Error: %s&quot;, cfg.FileName(), err)
+	}
+
+	err = data.Init(dataCfg)
+	if err != nil {
+		log.Fatalf(&quot;Error initializing townsourced data layer: %s&quot;, err.Error())
+	}
+
+	...
+}
+
+</code></pre>
+
+<h2 id="the-web-package">The Web Package</h2>
+
+<p>The <strong>web</strong> package is the client&rsquo;s entry point to your application.  Here you will extensively use the <a href="https://golang.org/pkg/net/http/">http package</a>
+and the <a href="https://golang.org/pkg/encoding/json">encoding/json package</a> for any REST APIs.</p>
+
+<p>You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
+package and its types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
+another way you shouldn&rsquo;t need to import http in <em>any</em> other packages except this one.  Preventing the http package from
+leaking into other packages will help keep the responsibilities of http handling clearly defined <em>only</em> in the web package.</p>
+
+<h2 id="the-app-package">The App Package</h2>
+
+<p>The <strong>app</strong> package is where the meat of your application will be.  Inside this package you&rsquo;ll define exported types
+that will be passed to and from your other packages; types like <code>app.User</code> and <code>app.Session</code>.  The point of the app package
+is to validate and handle data within these types, so most of your code in the app package will be methods on types, or
+functions that return these types. Be conservative about which types and methods you choose to export.  The web package
+doesn&rsquo;t need to understand how an <code>app.User</code> is approved to see data, it just needs to know whether they can or not.</p>
+
+<p>More likely than not your application data will be related to each other.  Try to retrieve types from their relationships
+with other types rather than from standalone functions.</p>
+
+<pre><code class="language-Go">	//  instead of this
+	func UserFromSession(s *Session) (*User, error) {
+
+	}
+
+	// do this
+	func(s *Session) User() (*User, error){
+
+	}
+
+</code></pre>
+
+<p>If standalone functions are necessary or make more sense (for instance when they don&rsquo;t actually modify any type data),
+then don&rsquo;t export them.</p>
+
+<p>If you aren&rsquo;t careful you may find yourself implementing parts of your application in the web or data layers when they
+should be in the app layer; for example, access controls.</p>
+
+<p>You may be tempted to check if a user has access to some data at the web layer, but this type of access control should
+always be done at the app layer, where it can be easily found, and unit tested.</p>
+
+<pre><code class="language-Go">// instead of this
+
+package web
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	if currentUser.Equal(userBeingViewed) {
+		profile, err := userBeingViewed.Profile()
+	}
+}
+
+// do this
+
+package app
+
+func (u *User) Profile(who *User) (*ProfileData, error) {
+	if !u.equal(who) {
+		return nil, errors.New(&quot;You do not have access to view this profile!&quot;)
+	}
+
+	return &amp;ProfileData{}, nil
+}
+
+
+</code></pre>
+
+<h2 id="the-data-package">The Data Package</h2>
+
+<p>The data package is for getting and setting data in your persistent and temporary storage.  There shouldn&rsquo;t be any types
+kept here unless they are types that augment the data layer.  For example, you shouldn&rsquo;t see a <code>User</code> or <code>Session</code> in the
+data layer, but you may see a type called <code>UUID</code> that exists within the <code>app.User</code> or <code>app.Session</code> types.</p>
+
+<p>A specific example of this in <a href="https://www.townsourced.com">Townsourced</a> is the <code>data.Version</code> type which looks like
+this:</p>
+
+<pre><code class="language-Go">type Version struct {
+	VerTag  string   // Unique, random value identifying this version
+	Created time.Time // When this record was first created
+	Updated time.Time // when this record was last updated
+}
+</code></pre>
+
+<p>This Version type is then embedded in other types to easily track when objects are created and updated.</p>
+
+<pre><code class="language-Go">type User struct {
+	Username       data.Key        
+	Email          string         
+	...
+	data.Version
+}
+
+</code></pre>
+
+<p>The real usefulness of <code>data.Version</code>, and the reason it exists in the <code>data</code> package is its ability to prevent any
+updates running in the data layer if the <code>vertag</code> being submitted by the user doesn&rsquo;t match the <code>vertag</code> in of the
+record in the database, preventing your users from updating an entry based on stale data.</p>
+
+<p>Another example of the data layer&rsquo;s responsibilities is cache invalidation. In Townsourced, the code to determine when to
+invalidate and update <em>memcached</em> entries exists in the <code>data</code> layer, not the <code>app</code> layer.  The <code>app</code> layer shouldn&rsquo;t
+worry about <em>how</em> data is stored or retrieved, it should only concern itself with the structure and behavior of its types.</p>
+
+<h2 id="putting-it-all-together">Putting it all together</h2>
+
+<p>At this point your web application should look like this:</p>
+
+<pre><code>webapp
+|--main.go
+|
+|--app
+|   |--user.go
+|   |--session.go
+|   |--whatever.go
+|   
+|--data
+|   |--data.go
+|   |--version.go
+|   
+|--web
+    |--server.go
+    |--json.go
+
+</code></pre>
+
+<ul>
+<li><code>main.go</code> imports <code>web</code>, <code>app</code>, and <code>data</code></li>
+<li><code>web</code> imports <code>app</code> and <code>data</code></li>
+<li><code>app</code> imports <code>data</code></li>
+</ul>
+
+<h1 id="error-handling">Error Handling</h1>
+
+<p>Handling errors properly is important in any application, but especially so in web applications where your users may be
+anyone from a 90 year old grandmother trying to get to facebook from your website, or a sophisticated hacker who&rsquo;s bored
+and looking for an easy target.</p>
+
+<p>In web applications, errors tend to happen in one of two ways: the system broke or the user broke the system. Conveniently
+http has already given us status code ranges to differentiate between the two types of errors:</p>
+
+<ul>
+<li>Status 400 range - User Errors</li>
+<li>Status 500 range - Server Errors</li>
+</ul>
+
+<p>If the user breaks the system by putting in bad input using the web application in a way that wasn&rsquo;t intended, they should
+be notified of the mistake with a clear explanation of what went wrong and how.  I refer to these errors as <strong>Failures</strong>.</p>
+
+<p>If the system breaks (due to network, hardware, or system design issues) the user should <em>not</em> be given any details.<br />
+Any information returned as to the cause of the error is a potential security issue where you may be leaking private
+details of your server architecture, configuration vulnerabilities, or specific library versions which could then be
+used to attack your application in a specific way.</p>
+
+<p>To help manage which errors should be visible to users and which shouldn&rsquo;t, I usually create a <code>fail</code> package, which
+resides outside the existing packages. It exists outside the main packages, because failures may happen in any
+of them.  Inside the <code>fail</code> package is the <code>fail.Fail</code> type which implements the <code>error</code> interface, so it can be
+returned like a normal error.</p>
+
+<pre><code class="language-Go">type Fail struct {
+	Message    string      `json:&quot;message,omitempty&quot;`
+	Data       interface{} `json:&quot;data,omitempty&quot;`
+	HTTPStatus int         `json:&quot;-&quot;` //gets set in the error response
+}
+
+func (f *Fail) Error() string {
+	return f.Message
+}
+
+// IsFail tests whether the passed in error is a failure
+func IsFail(err error) bool {
+	if err == nil {
+		return false
+	}
+	switch err.(type) {
+	case *Fail:
+		return true
+	default:
+		return false
+	}
+}
+
+</code></pre>
+
+<p>When errors bubble up to the <code>web</code> package, you can use a <a href="https://golang.org/doc/effective_go.html#type_switch">type switch</a>
+to determine which are failures that can be shown to the user.</p>
+
+<pre><code class="language-Go">errMsg := &quot;&quot;
+
+switch err.(type) {
+case *fail.Fail:
+	errMsg = err.Error()
+case *http.ProtocolError, *json.SyntaxError, *json.UnmarshalTypeError:
+	//Hardcoded error types which can bubble up to the end users
+	// without exposing internal server information, make them behave like failures
+	err = fail.NewFromErr(err)
+	errMsg = fmt.Sprintf(&quot;We had trouble parsing your input, please check your input and try again: %s&quot;, err)
+default:
+	errMsg = &quot;An internal server error has occurred&quot;
+}
+
+</code></pre>
+
+<h1 id="tips-and-tricks">Tips and Tricks</h1>
+
+<h2 id="json-input">JSON Input</h2>
+
+<p>When handling JSON input, such as for an API, be wary of Go&rsquo;s <a href="https://golang.org/ref/spec#The_zero_value">zero values</a>.
+In an API you need to be able to tell the difference between setting a value to a zero value, and not setting a value at
+all. Consider the following scenario.  Let&rsquo;s say you have an API where the user can set their Name or the Email Address,
+you may define the input like this:</p>
+
+<pre><code class="language-Go">type UserInput struct {
+	Email string
+	Name  string
+}
+</code></pre>
+
+<p>If a user just wants to update their Name and not their Email, they&rsquo;ll send some JSON like this:</p>
+
+<pre><code class="language-Javascript">{ Name: &quot;New Name&quot; }
+</code></pre>
+
+<p>Which when parsed, will result in <code>Name == &quot;New Name&quot;</code> and <code>Email == &quot;&quot;</code>.  You don&rsquo;t know if the user meant to set their
+email to <code>&quot;&quot;</code> or if they simply didn&rsquo;t specify any change to their Email.</p>
+
+<p>You should instead define your input with pointers:</p>
+
+<pre><code class="language-Go">type UserInput struct {
+	Email *string
+	Name  *string
+}
+</code></pre>
+
+<p>This way you can check if Email was set to <code>&quot;&quot;</code> or if it wasn&rsquo;t specified at all:</p>
+
+<pre><code class="language-Go">if input.Email != nil {
+	//update email
+}
+</code></pre>
+
+<p>Be careful to check each input though, so you don&rsquo;t run into any nil pointer panics.</p>
+
+<h2 id="development">Development</h2>
+
+<p>When developing your web application, you need to see immediate feedback from the changes you&rsquo;re making.  This means seeing
+the results of your work without having to restart your web server.  For this reason it&rsquo;s important to create a <em>dev mode</em>
+in your application that can be turned on via a command line flag, or environment variable.  Once set, you can use this
+variable to rebuild templates on every request, reload files on every request, watch for file changes and auto-reload
+the web page. You&rsquo;d be surprised how much your productivity can suffer with a long write and evaluate loop.  In my
+opinion it&rsquo;s worth spending time getting this working as soon as possible.</p>
+
+<pre><code class="language-Go">func (t templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if devMode || t.template == nil {
+		t.loadTemplates()
+	}
+}
+</code></pre>
+
+<h2 id="sync-pool">sync.Pool</h2>
+
+<p>Which each connection coming in on its own separate go-routine, the easiest way to write your code is create and destroy
+everything you need within that go-routine.  This will work for a while, but eventually, if your request load starts
+increasing you&rsquo;ll start running into issues with garbage collection.  Most of the time, the answer to that problem is
+<code>sync.Pool</code>.</p>
+
+<p>For example, if you want to gzip every response, your first pass may have you creating a new gzip writer on every request.
+If your server gets a huge spike in traffic, then your server will be spending a lot of time reclaiming unused gzip writers
+when things start to die down.</p>
+
+<p>Instead, you can use <code>sync.Pool</code> to instantiate your gzip writers, and when you&rsquo;re done with them, put them back in the
+pool to be reused, instead of garbage collected.</p>
+
+<pre><code class="language-Go">func init() {
+	zipPool = sync.Pool{
+		New: func() interface{} {
+			return gzip.NewWriter(nil)
+		},
+	}
+}
+
+...
+
+// custom response writer
+type gzipResponse struct {
+	zip *gzip.Writer
+	http.ResponseWriter
+}
+
+func (g *gzipResponse) Write(b []byte) (int, error) {
+	if g.zip == nil {
+		return g.ResponseWriter.Write(b)
+	}
+	return g.zip.Write(b)
+}
+
+// http server calls Close() on the responseWriter
+// return the gzip writer to the pool
+func (g *gzipResponse) Close() error {
+	if g.zip == nil {
+		return nil
+	}
+	err := g.zip.Close()
+	if err != nil {
+		return err
+	}
+	zipPool.Put(g.zip)
+	return nil
+}
+
+func responseWriter(w http.ResponseWriter, r *http.Request) *gzipResponse {
+	var writer *gzip.Writer
+	if strings.Contains(r.Header.Get(&quot;Accept-Encoding&quot;), &quot;gzip&quot;) {
+		w.Header().Set(&quot;Content-Encoding&quot;, &quot;gzip&quot;)
+		gz := zipPool.Get().(*gzip.Writer)
+		gz.Reset(w)
+		writer = gz
+	}
+	return &amp;gzipResponse{zip: writer, ResponseWriter: w}
+}
+</code></pre>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>As you can see from the length of this post, there are a lot of things to consider when building a web application, and
+I&rsquo;ve only just scratched the surface of the topic.  Hopefully this post can act as a foundation to start from, as well
+as a base to refer to in future posts about more specific aspects of web application development in Go.</p>
+
+<p>I hope you find this post useful, and if you have any corrections, questions, or suggestions for future posts, let me
+know in the comments below.</p>
+												</div>
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															
+																<span>
+																	<a href="http://tech.townsourced.com/tags/development">
+																		<a href="http://tech.townsourced.com/categories/development">Development</a>
+																	</a>
+																</span>
+															
+													</span>
+
+													<ul class="list-inline tags text-right">
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/go">
+																	<span class="label label-theme">#Go</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/web-development">
+																	<span class="label label-theme">#Web Development</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/tutorial">
+																	<span class="label label-theme">#tutorial</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/reference">
+																	<span class="label label-theme">#reference</span>
+																</a>
+															</li>
+														
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'techtownsourcedcom';
+    var disqus_identifier = 'http:\/\/tech.townsourced.com\/post\/anatomy-of-a-go-web-app\/';
+    var disqus_title = 'Anatomy of a Go Web Application';
+    var disqus_url = 'http:\/\/tech.townsourced.com\/post\/anatomy-of-a-go-web-app\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+												</div>
+                    </div>                 
+									</section>
+                
+            </div>
+						<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div>  
+				</div>                 
+		</aside>
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						
+							<li>
+								<a href="http://tech.townsourced.com/categories/development">development</a>
+							</li>
+						
+					</ul>
+					<hr>
+					<ul class="list-inline tags">
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/go">
+									<span class="label label-theme">#go</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/reference">
+									<span class="label label-theme">#reference</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/tutorial">
+									<span class="label label-theme">#tutorial</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/web-development">
+									<span class="label label-theme">#web-development</span>
+								</a>
+							</li>
+						
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="https://www.townsourced.com" target="_blank"><i class="fa fa-external-link"></i>Townsourced</a></h3>
+										<p class="description">
+											A locally moderated community bulletin board, built to help communities discover events, share, shop and sell locally.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on BoltDB.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div>  
+				</div>                 
+		</aside>
+</div>
+
+					</div>
+    </div>
+	 
+<footer class="footer">
+		<div class="container text-center">
+						<small class="copyright">
+							<div>© <a href="https://solutions.townsourced.com" target="_blank">Townsourced</a>  - design modified from template by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a></div>
+							<div>
+						Unless otherwise noted, content is released under a  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</div>
+						</small>
+		</div>
+</footer>
+
+<script type="text/javascript" src="http://tech.townsourced.com/js/prism.js"></script>            
+
+
+<script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
+
+
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    _paq.push(['setTrackerUrl',  'https://api-e68fcf7f9c66665c7e009b9f533bdf6f.townsourced.com']);
+    _paq.push(['setSiteId', 2]);
+    _paq.push(['setApiToken', 'E80SMnaO8kFL-gyxQRvLEUTUOCv6zi3R63VALxf64ft']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://5plhgbtl6we7tvxqeqt1.townsourced.com/embed.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+
+
+
+    
+
+	<script type="text/javascript">
+		
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
+</body>
+</html> 

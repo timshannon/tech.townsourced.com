@@ -1,70 +1,506 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Post-rsses on Townsourced Tech Blog</title>
+    <title>Posts on Townsourced Tech Blog</title>
     <link>http://tech.townsourced.com/post/index.xml</link>
-    <description>Recent content in Post-rsses on Townsourced Tech Blog</description>
+    <description>Recent content in Posts on Townsourced Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
-    <lastBuildDate>Fri, 04 Nov 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 04 Dec 2016 10:37:07 -0600</lastBuildDate>
     <atom:link href="http://tech.townsourced.com/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Test Html Post</title>
-      <link>http://tech.townsourced.com/post/test-html-post/</link>
-      <pubDate>Fri, 04 Nov 2016 00:00:00 +0000</pubDate>
+      <title>Anatomy of a Go Web Application</title>
+      <link>http://tech.townsourced.com/post/anatomy-of-a-go-web-app/</link>
+      <pubDate>Sun, 04 Dec 2016 10:37:07 -0600</pubDate>
       
-      <guid>http://tech.townsourced.com/post/test-html-post/</guid>
-      <description>&lt;p&gt;
-This content is written in html directly as a test.
-&lt;p&gt;
-&lt;p&gt;
-It has several paragraphs and an image
-&lt;/p&gt;
-&lt;!--more--&gt;
-&lt;img src=&#34;https://solutions.townsourced.com/assets/images/team/tim.jpg&#34;&gt;
-&lt;ul&gt;
-	&lt;li&gt;list item&lt;/li&gt;
-	&lt;li&gt;list item&lt;/li&gt;
-	&lt;li&gt;list item&lt;/li&gt;
-	&lt;li&gt;list item&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Test Post</title>
-      <link>http://tech.townsourced.com/post/test-post/</link>
-      <pubDate>Thu, 03 Nov 2016 00:00:00 +0000</pubDate>
-      
-      <guid>http://tech.townsourced.com/post/test-post/</guid>
-      <description>&lt;p&gt;With lots of test content.
-And some lists here:&lt;/p&gt;
+      <guid>http://tech.townsourced.com/post/anatomy-of-a-go-web-app/</guid>
+      <description>&lt;p&gt;When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give
+one more example of how you can go about building a web application in the Go language, as well as to give you and idea
+what things you need to start thinking about and plan for before you get started.&lt;/p&gt;
+
+&lt;p&gt;This guide is not intended to exhaustive, nor is it absolute. It is a compendium of the things I thought about and how I dealt
+with them when building &lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced.com&lt;/a&gt;.  Hopefully you&amp;rsquo;ll find it useful.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;package-layout-and-code-organization&#34;&gt;Package Layout and Code Organization&lt;/h1&gt;
+
+&lt;p&gt;Clean separation of duties, and clear code boundaries are crucial to figure out when building large applications.  I&amp;rsquo;ve
+found, with web applications, these the 3 package delineations are required:&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;first&lt;/li&gt;
-&lt;li&gt;second&lt;/li&gt;
-&lt;li&gt;3rd&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#the-web-package&#34;&gt;web&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#the-app-package&#34;&gt;app&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#the-data-package&#34;&gt;data&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>new post</title>
-      <link>http://tech.townsourced.com/post/newpost/</link>
-      <pubDate>Thu, 27 Oct 2016 16:21:11 -0500</pubDate>
-      
-      <guid>http://tech.townsourced.com/post/newpost/</guid>
-      <description>&lt;p&gt;New Post with new stuff&lt;/p&gt;
+&lt;p&gt;There may be others, but for the most part your code will fall into one of these 3 packages, or sub-packages
+within them.&lt;/p&gt;
 
-&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sed dui neque. Maecenas dignissim non ex nec auctor. In semper nisl ex, nec tristique felis ornare ut. Pellentesque massa ligula, tempus sit amet magna vitae, efficitur auctor sapien. In non viverra metus. Phasellus suscipit enim massa, eu luctus nibh lacinia quis. Aliquam laoreet mi augue, a sollicitudin nibh accumsan a. Duis eget posuere massa, vel condimentum magna. Aenean molestie convallis urna.&lt;/p&gt;
+&lt;p&gt;But, before we get into packages, we need to setup the main entry point to our program.  In Go, this means &lt;code&gt;func main()&lt;/code&gt;
+and I usually put mine in &lt;code&gt;main.go&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Ut sed ornare quam. Vestibulum eget felis ut nisl pulvinar vestibulum at eget nunc. Etiam fringilla mi odio, dapibus porttitor est consectetur venenatis. Cras quis vulputate urna, mattis tristique est. Etiam interdum velit augue, ut tincidunt arcu faucibus pretium. Nunc orci velit, maximus in augue et, molestie pulvinar justo. Morbi iaculis metus et aliquet tempus. Ut gravida euismod nulla, in laoreet neque consequat ac. Morbi eleifend, turpis quis egestas congue, risus leo malesuada diam, eu faucibus ex lectus a lectus. Donec molestie ex ac magna laoreet ornare. Proin consectetur tempor dolor, vulputate egestas erat euismod molestie. In euismod et ipsum id fringilla. Nunc ultricies, neque non consequat tincidunt, dolor mauris pretium nibh, vitae volutpat ligula magna nec nisi. Sed malesuada semper vulputate. Phasellus nec hendrerit neque, accumsan hendrerit lacus. In massa mi, porta rhoncus purus sit amet, viverra facilisis tortor.&lt;/p&gt;
+&lt;h2 id=&#34;main-go&#34;&gt;main.go&lt;/h2&gt;
 
-&lt;p&gt;Aenean vitae tortor aliquet elit commodo rutrum. Ut nec tortor diam. Vivamus orci diam, placerat condimentum sem sed, mollis dictum elit. Vivamus scelerisque dignissim ipsum in cursus. Aliquam feugiat ex in arcu dignissim congue. Donec venenatis, mi ac euismod mattis, dui lorem feugiat mi, eu volutpat sapien nibh sed nisi. Morbi cursus diam et semper tempus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi scelerisque scelerisque quam in condimentum. Suspendisse et erat non urna sodales bibendum vitae id dui. Vestibulum tincidunt diam a enim mollis, vel viverra nisl interdum. Nam vel arcu nec erat venenatis laoreet fringilla quis mi. Proin et consequat ex. Nunc vitae nisl sit amet purus tincidunt porttitor in vitae libero. Nunc volutpat sagittis massa sit amet pulvinar. Aliquam erat volutpat.&lt;/p&gt;
-</description>
+&lt;p&gt;&lt;code&gt;main.go&lt;/code&gt; will be responsible for loading anything configurable in your web app and passing those configuration options
+into the other layers.  There are many different options for storing your app&amp;rsquo;s configuration, personally I store mine
+in json files using &lt;a href=&#34;https://github.com/timshannon/config&#34;&gt;small configuration library&lt;/a&gt; I wrote.  If you want many options
+including environment variables, TOML, YAML, or JSON , check out  Steve Francia&amp;rsquo;s excellent &lt;a href=&#34;https://github.com/spf13/viper&#34;&gt;Viper library&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Below is an example of townsourced&amp;rsquo;s config file to give you an idea of the types of options you may put in there:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;{
+    &amp;quot;app&amp;quot;: {
+        &amp;quot;httpClientTimeout&amp;quot;: &amp;quot;30s&amp;quot;, 
+        &amp;quot;taskPollTime&amp;quot;: &amp;quot;1m&amp;quot;,
+        &amp;quot;taskQueueSize&amp;quot;: 100
+    },
+    &amp;quot;data&amp;quot;: {
+        &amp;quot;cache&amp;quot;: { // memcached servers
+            &amp;quot;addresses&amp;quot;: [
+                &amp;quot;127.0.0.1:11211&amp;quot;
+            ]
+        },
+        &amp;quot;db&amp;quot;: { // RethinkDB 
+            &amp;quot;address&amp;quot;: &amp;quot;127.0.0.1:28015&amp;quot;,
+            &amp;quot;database&amp;quot;: &amp;quot;townsourced&amp;quot;,
+            &amp;quot;timeout&amp;quot;: &amp;quot;60s&amp;quot;
+        },
+        &amp;quot;search&amp;quot;: {  // ElasticSearch
+            &amp;quot;addresses&amp;quot;: [
+                &amp;quot;http://127.0.0.1:9200&amp;quot;
+            ],
+            &amp;quot;index&amp;quot;: {
+                &amp;quot;name&amp;quot;: &amp;quot;townsourced&amp;quot;,
+                &amp;quot;replicas&amp;quot;: 1,
+                &amp;quot;shards&amp;quot;: 5
+            },
+            &amp;quot;maxRetries&amp;quot;: 0
+        }
+    },
+    &amp;quot;web&amp;quot;: {
+        &amp;quot;address&amp;quot;: &amp;quot;http://localhost:8080&amp;quot;,
+        &amp;quot;certFile&amp;quot;: &amp;quot;&amp;quot;, 
+        &amp;quot;keyFile&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;maxHeaderBytes&amp;quot;: 0,
+        &amp;quot;maxUploadMemoryMB&amp;quot;: 10,
+        &amp;quot;minTLSVersion&amp;quot;: 769,
+        &amp;quot;readTimeout&amp;quot;: &amp;quot;60s&amp;quot;,
+        &amp;quot;writeTimeout&amp;quot;: &amp;quot;60s&amp;quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I defined this configuration as separate structs in each package: &lt;code&gt;web.Config&lt;/code&gt;, &lt;code&gt;app.Config&lt;/code&gt;, and &lt;code&gt;data.Config&lt;/code&gt;.
+You&amp;rsquo;ll then load the configuration into these structs, and pass them into their respective packages. This is also a good
+time to initialize any clients in those packages as well.  In Townsourced, this looks like the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package data
+
+type Config struct {
+	DB      DBConfig     `json:&amp;quot;db&amp;quot;`
+	Cache   CacheConfig  `json:&amp;quot;cache&amp;quot;`
+	Search  SearchConfig `json:&amp;quot;search&amp;quot;`
+}
+
+// DefaultConfig returns the default configuration for the data layer
+func DefaultConfig() *Config {
+	return &amp;amp;Config{
+		DB: DBConfig{
+			Address:  &amp;quot;127.0.0.1:28015&amp;quot;,
+			Database: DatabaseName,
+			Timeout:  &amp;quot;60s&amp;quot;,
+		},
+		Cache: CacheConfig{
+			Addresses: []string{&amp;quot;127.0.0.1:11211&amp;quot;},
+		},
+		Search: SearchConfig{
+			Addresses:  []string{&amp;quot;http://127.0.0.1:9200&amp;quot;},
+			MaxRetries: 0,
+			Index: SearchIndexConfig{
+				Name:     &amp;quot;townsourced&amp;quot;,
+				Shards:   5,
+				Replicas: 1,
+			},
+		},
+	}
+}
+
+func Init(cfg *Config) error {
+	// initialize rethinkdb, memcached and elasticsearch clients based on passed in config
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Config is then loaded and passed into the &lt;code&gt;data&lt;/code&gt; layer:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;// main.go
+
+package main
+
+func main() {
+	...
+
+	settingPaths := config.StandardFileLocations(&amp;quot;townsourced/settings.json&amp;quot;)
+	cfg, err := config.LoadOrCreate(settingPaths...)
+	if err != nil {
+		app.Halt(err.Error())
+	}
+
+	...
+
+	dataCfg := data.DefaultConfig()
+
+	err = cfg.ValueToType(&amp;quot;data&amp;quot;, dataCfg)
+	if err != nil {
+		app.Halt(&amp;quot;Error reading data config values: %s&amp;quot;, err.Error())
+	}
+
+	err = cfg.Write()
+	if err != nil {
+		app.Halt(&amp;quot;Error writing config file to %s. Error: %s&amp;quot;, cfg.FileName(), err)
+	}
+
+	err = data.Init(dataCfg)
+	if err != nil {
+		log.Fatalf(&amp;quot;Error initializing townsourced data layer: %s&amp;quot;, err.Error())
+	}
+
+	...
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;the-web-package&#34;&gt;The Web Package&lt;/h2&gt;
+
+&lt;p&gt;The &lt;strong&gt;web&lt;/strong&gt; package is the client&amp;rsquo;s entry point to your application.  Here you will extensively use the &lt;a href=&#34;https://golang.org/pkg/net/http/&#34;&gt;http package&lt;/a&gt;
+and the &lt;a href=&#34;https://golang.org/pkg/encoding/json&#34;&gt;encoding/json package&lt;/a&gt; for any REST APIs.&lt;/p&gt;
+
+&lt;p&gt;You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
+package and its types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
+another way you shouldn&amp;rsquo;t need to import http in &lt;em&gt;any&lt;/em&gt; other packages except this one.  Preventing the http package from
+leaking into other packages will help keep the responsibilities of http handling clearly defined &lt;em&gt;only&lt;/em&gt; in the web package.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-app-package&#34;&gt;The App Package&lt;/h2&gt;
+
+&lt;p&gt;The &lt;strong&gt;app&lt;/strong&gt; package is where the meat of your application will be.  Inside this package you&amp;rsquo;ll define exported types
+that will be passed to and from your other packages; types like &lt;code&gt;app.User&lt;/code&gt; and &lt;code&gt;app.Session&lt;/code&gt;.  The point of the app package
+is to validate and handle data within these types, so most of your code in the app package will be methods on types, or
+functions that return these types. Be conservative about which types and methods you choose to export.  The web package
+doesn&amp;rsquo;t need to understand how an &lt;code&gt;app.User&lt;/code&gt; is approved to see data, it just needs to know whether they can or not.&lt;/p&gt;
+
+&lt;p&gt;More likely than not your application data will be related to each other.  Try to retrieve types from their relationships
+with other types rather than from standalone functions.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;	//  instead of this
+	func UserFromSession(s *Session) (*User, error) {
+
+	}
+
+	// do this
+	func(s *Session) User() (*User, error){
+
+	}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If standalone functions are necessary or make more sense (for instance when they don&amp;rsquo;t actually modify any type data),
+then don&amp;rsquo;t export them.&lt;/p&gt;
+
+&lt;p&gt;If you aren&amp;rsquo;t careful you may find yourself implementing parts of your application in the web or data layers when they
+should be in the app layer; for example, access controls.&lt;/p&gt;
+
+&lt;p&gt;You may be tempted to check if a user has access to some data at the web layer, but this type of access control should
+always be done at the app layer, where it can be easily found, and unit tested.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;// instead of this
+
+package web
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	if currentUser.Equal(userBeingViewed) {
+		profile, err := userBeingViewed.Profile()
+	}
+}
+
+// do this
+
+package app
+
+func (u *User) Profile(who *User) (*ProfileData, error) {
+	if !u.equal(who) {
+		return nil, errors.New(&amp;quot;You do not have access to view this profile!&amp;quot;)
+	}
+
+	return &amp;amp;ProfileData{}, nil
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;the-data-package&#34;&gt;The Data Package&lt;/h2&gt;
+
+&lt;p&gt;The data package is for getting and setting data in your persistent and temporary storage.  There shouldn&amp;rsquo;t be any types
+kept here unless they are types that augment the data layer.  For example, you shouldn&amp;rsquo;t see a &lt;code&gt;User&lt;/code&gt; or &lt;code&gt;Session&lt;/code&gt; in the
+data layer, but you may see a type called &lt;code&gt;UUID&lt;/code&gt; that exists within the &lt;code&gt;app.User&lt;/code&gt; or &lt;code&gt;app.Session&lt;/code&gt; types.&lt;/p&gt;
+
+&lt;p&gt;A specific example of this in &lt;a href=&#34;https://www.townsourced.com&#34;&gt;Townsourced&lt;/a&gt; is the &lt;code&gt;data.Version&lt;/code&gt; type which looks like
+this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;type Version struct {
+	VerTag  string   // Unique, random value identifying this version
+	Created time.Time // When this record was first created
+	Updated time.Time // when this record was last updated
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This Version type is then embedded in other types to easily track when objects are created and updated.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;type User struct {
+	Username       data.Key        
+	Email          string         
+	...
+	data.Version
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The real usefulness of &lt;code&gt;data.Version&lt;/code&gt;, and the reason it exists in the &lt;code&gt;data&lt;/code&gt; package is its ability to prevent any
+updates running in the data layer if the &lt;code&gt;vertag&lt;/code&gt; being submitted by the user doesn&amp;rsquo;t match the &lt;code&gt;vertag&lt;/code&gt; in of the
+record in the database, preventing your users from updating an entry based on stale data.&lt;/p&gt;
+
+&lt;p&gt;Another example of the data layer&amp;rsquo;s responsibilities is cache invalidation. In Townsourced, the code to determine when to
+invalidate and update &lt;em&gt;memcached&lt;/em&gt; entries exists in the &lt;code&gt;data&lt;/code&gt; layer, not the &lt;code&gt;app&lt;/code&gt; layer.  The &lt;code&gt;app&lt;/code&gt; layer shouldn&amp;rsquo;t
+worry about &lt;em&gt;how&lt;/em&gt; data is stored or retrieved, it should only concern itself with the structure and behavior of its types.&lt;/p&gt;
+
+&lt;h2 id=&#34;putting-it-all-together&#34;&gt;Putting it all together&lt;/h2&gt;
+
+&lt;p&gt;At this point your web application should look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;webapp
+|--main.go
+|
+|--app
+|   |--user.go
+|   |--session.go
+|   |--whatever.go
+|   
+|--data
+|   |--data.go
+|   |--version.go
+|   
+|--web
+    |--server.go
+    |--json.go
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;main.go&lt;/code&gt; imports &lt;code&gt;web&lt;/code&gt;, &lt;code&gt;app&lt;/code&gt;, and &lt;code&gt;data&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;web&lt;/code&gt; imports &lt;code&gt;app&lt;/code&gt; and &lt;code&gt;data&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;app&lt;/code&gt; imports &lt;code&gt;data&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;error-handling&#34;&gt;Error Handling&lt;/h1&gt;
+
+&lt;p&gt;Handling errors properly is important in any application, but especially so in web applications where your users may be
+anyone from a 90 year old grandmother trying to get to facebook from your website, or a sophisticated hacker who&amp;rsquo;s bored
+and looking for an easy target.&lt;/p&gt;
+
+&lt;p&gt;In web applications, errors tend to happen in one of two ways: the system broke or the user broke the system. Conveniently
+http has already given us status code ranges to differentiate between the two types of errors:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Status 400 range - User Errors&lt;/li&gt;
+&lt;li&gt;Status 500 range - Server Errors&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If the user breaks the system by putting in bad input using the web application in a way that wasn&amp;rsquo;t intended, they should
+be notified of the mistake with a clear explanation of what went wrong and how.  I refer to these errors as &lt;strong&gt;Failures&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;If the system breaks (due to network, hardware, or system design issues) the user should &lt;em&gt;not&lt;/em&gt; be given any details.&lt;br /&gt;
+Any information returned as to the cause of the error is a potential security issue where you may be leaking private
+details of your server architecture, configuration vulnerabilities, or specific library versions which could then be
+used to attack your application in a specific way.&lt;/p&gt;
+
+&lt;p&gt;To help manage which errors should be visible to users and which shouldn&amp;rsquo;t, I usually create a &lt;code&gt;fail&lt;/code&gt; package, which
+resides outside the existing packages. It exists outside the main packages, because failures may happen in any
+of them.  Inside the &lt;code&gt;fail&lt;/code&gt; package is the &lt;code&gt;fail.Fail&lt;/code&gt; type which implements the &lt;code&gt;error&lt;/code&gt; interface, so it can be
+returned like a normal error.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;type Fail struct {
+	Message    string      `json:&amp;quot;message,omitempty&amp;quot;`
+	Data       interface{} `json:&amp;quot;data,omitempty&amp;quot;`
+	HTTPStatus int         `json:&amp;quot;-&amp;quot;` //gets set in the error response
+}
+
+func (f *Fail) Error() string {
+	return f.Message
+}
+
+// IsFail tests whether the passed in error is a failure
+func IsFail(err error) bool {
+	if err == nil {
+		return false
+	}
+	switch err.(type) {
+	case *Fail:
+		return true
+	default:
+		return false
+	}
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When errors bubble up to the &lt;code&gt;web&lt;/code&gt; package, you can use a &lt;a href=&#34;https://golang.org/doc/effective_go.html#type_switch&#34;&gt;type switch&lt;/a&gt;
+to determine which are failures that can be shown to the user.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;errMsg := &amp;quot;&amp;quot;
+
+switch err.(type) {
+case *fail.Fail:
+	errMsg = err.Error()
+case *http.ProtocolError, *json.SyntaxError, *json.UnmarshalTypeError:
+	//Hardcoded error types which can bubble up to the end users
+	// without exposing internal server information, make them behave like failures
+	err = fail.NewFromErr(err)
+	errMsg = fmt.Sprintf(&amp;quot;We had trouble parsing your input, please check your input and try again: %s&amp;quot;, err)
+default:
+	errMsg = &amp;quot;An internal server error has occurred&amp;quot;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;tips-and-tricks&#34;&gt;Tips and Tricks&lt;/h1&gt;
+
+&lt;h2 id=&#34;json-input&#34;&gt;JSON Input&lt;/h2&gt;
+
+&lt;p&gt;When handling JSON input, such as for an API, be wary of Go&amp;rsquo;s &lt;a href=&#34;https://golang.org/ref/spec#The_zero_value&#34;&gt;zero values&lt;/a&gt;.
+In an API you need to be able to tell the difference between setting a value to a zero value, and not setting a value at
+all. Consider the following scenario.  Let&amp;rsquo;s say you have an API where the user can set their Name or the Email Address,
+you may define the input like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;type UserInput struct {
+	Email string
+	Name  string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If a user just wants to update their Name and not their Email, they&amp;rsquo;ll send some JSON like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Javascript&#34;&gt;{ Name: &amp;quot;New Name&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Which when parsed, will result in &lt;code&gt;Name == &amp;quot;New Name&amp;quot;&lt;/code&gt; and &lt;code&gt;Email == &amp;quot;&amp;quot;&lt;/code&gt;.  You don&amp;rsquo;t know if the user meant to set their
+email to &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; or if they simply didn&amp;rsquo;t specify any change to their Email.&lt;/p&gt;
+
+&lt;p&gt;You should instead define your input with pointers:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;type UserInput struct {
+	Email *string
+	Name  *string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This way you can check if Email was set to &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; or if it wasn&amp;rsquo;t specified at all:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;if input.Email != nil {
+	//update email
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Be careful to check each input though, so you don&amp;rsquo;t run into any nil pointer panics.&lt;/p&gt;
+
+&lt;h2 id=&#34;development&#34;&gt;Development&lt;/h2&gt;
+
+&lt;p&gt;When developing your web application, you need to see immediate feedback from the changes you&amp;rsquo;re making.  This means seeing
+the results of your work without having to restart your web server.  For this reason it&amp;rsquo;s important to create a &lt;em&gt;dev mode&lt;/em&gt;
+in your application that can be turned on via a command line flag, or environment variable.  Once set, you can use this
+variable to rebuild templates on every request, reload files on every request, watch for file changes and auto-reload
+the web page. You&amp;rsquo;d be surprised how much your productivity can suffer with a long write and evaluate loop.  In my
+opinion it&amp;rsquo;s worth spending time getting this working as soon as possible.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;func (t templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if devMode || t.template == nil {
+		t.loadTemplates()
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;sync-pool&#34;&gt;sync.Pool&lt;/h2&gt;
+
+&lt;p&gt;Which each connection coming in on its own separate go-routine, the easiest way to write your code is create and destroy
+everything you need within that go-routine.  This will work for a while, but eventually, if your request load starts
+increasing you&amp;rsquo;ll start running into issues with garbage collection.  Most of the time, the answer to that problem is
+&lt;code&gt;sync.Pool&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;For example, if you want to gzip every response, your first pass may have you creating a new gzip writer on every request.
+If your server gets a huge spike in traffic, then your server will be spending a lot of time reclaiming unused gzip writers
+when things start to die down.&lt;/p&gt;
+
+&lt;p&gt;Instead, you can use &lt;code&gt;sync.Pool&lt;/code&gt; to instantiate your gzip writers, and when you&amp;rsquo;re done with them, put them back in the
+pool to be reused, instead of garbage collected.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;func init() {
+	zipPool = sync.Pool{
+		New: func() interface{} {
+			return gzip.NewWriter(nil)
+		},
+	}
+}
+
+...
+
+// custom response writer
+type gzipResponse struct {
+	zip *gzip.Writer
+	http.ResponseWriter
+}
+
+func (g *gzipResponse) Write(b []byte) (int, error) {
+	if g.zip == nil {
+		return g.ResponseWriter.Write(b)
+	}
+	return g.zip.Write(b)
+}
+
+// http server calls Close() on the responseWriter
+// return the gzip writer to the pool
+func (g *gzipResponse) Close() error {
+	if g.zip == nil {
+		return nil
+	}
+	err := g.zip.Close()
+	if err != nil {
+		return err
+	}
+	zipPool.Put(g.zip)
+	return nil
+}
+
+func responseWriter(w http.ResponseWriter, r *http.Request) *gzipResponse {
+	var writer *gzip.Writer
+	if strings.Contains(r.Header.Get(&amp;quot;Accept-Encoding&amp;quot;), &amp;quot;gzip&amp;quot;) {
+		w.Header().Set(&amp;quot;Content-Encoding&amp;quot;, &amp;quot;gzip&amp;quot;)
+		gz := zipPool.Get().(*gzip.Writer)
+		gz.Reset(w)
+		writer = gz
+	}
+	return &amp;amp;gzipResponse{zip: writer, ResponseWriter: w}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;As you can see from the length of this post, there are a lot of things to consider when building a web application, and
+I&amp;rsquo;ve only just scratched the surface of the topic.  Hopefully this post can act as a foundation to start from, as well
+as a base to refer to in future posts about more specific aspects of web application development in Go.&lt;/p&gt;
+
+&lt;p&gt;I hope you find this post useful, and if you have any corrections, questions, or suggestions for future posts, let me
+know in the comments below.&lt;/p&gt;</description>
     </item>
     
   </channel>
