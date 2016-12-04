@@ -409,7 +409,7 @@ http has already given us status code ranges to differentiate between the two ty
 <p>If the user breaks the system by putting in bad input using the web application in a way that wasn&rsquo;t intended, they should
 be notified of the mistake with a clear explanation of what went wrong and how.  I refer to these errors as <strong>Failures</strong>.</p>
 
-<p>If the system breaks (due to network, hardware, or system design issues) the user should <em>not</em> be given any details.<br />
+<p>If the system breaks (due to network, hardware, or system design issues) the user should <em>not</em> be given any details.
 Any information returned as to the cause of the error is a potential security issue where you may be leaking private
 details of your server architecture, configuration vulnerabilities, or specific library versions which could then be
 used to attack your application in a specific way.</p>
@@ -483,7 +483,7 @@ you may define the input like this:</p>
 <pre><code class="language-Javascript">{ Name: &quot;New Name&quot; }
 </code></pre>
 
-<p>Which when parsed, will result in <code>Name == &quot;New Name&quot;</code> and <code>Email == &quot;&quot;</code>.  You don&rsquo;t know if the user meant to set their
+<p>Which, when parsed, will result in <code>Name == &quot;New Name&quot;</code> and <code>Email == &quot;&quot;</code>.  You don&rsquo;t know if the user meant to set their
 email to <code>&quot;&quot;</code> or if they simply didn&rsquo;t specify any change to their Email.</p>
 
 <p>You should instead define your input with pointers:</p>
@@ -521,7 +521,7 @@ opinion it&rsquo;s worth spending time getting this working as soon as possible.
 
 <h2 id="sync-pool">sync.Pool</h2>
 
-<p>Which each connection coming in on its own separate go-routine, the easiest way to write your code is create and destroy
+<p>When each connection comes in on its own separate go-routine, the easiest way to write your code is create and destroy
 everything you need within that go-routine.  This will work for a while, but eventually, if your request load starts
 increasing you&rsquo;ll start running into issues with garbage collection.  Most of the time, the answer to that problem is
 <code>sync.Pool</code>.</p>
