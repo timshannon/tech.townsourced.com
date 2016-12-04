@@ -319,7 +319,7 @@ http has already given us status code ranges to differentiate between the two ty
 &lt;p&gt;If the user breaks the system by putting in bad input using the web application in a way that wasn&amp;rsquo;t intended, they should
 be notified of the mistake with a clear explanation of what went wrong and how.  I refer to these errors as &lt;strong&gt;Failures&lt;/strong&gt;.&lt;/p&gt;
 
-&lt;p&gt;If the system breaks (due to network, hardware, or system design issues) the user should &lt;em&gt;not&lt;/em&gt; be given any details.&lt;br /&gt;
+&lt;p&gt;If the system breaks (due to network, hardware, or system design issues) the user should &lt;em&gt;not&lt;/em&gt; be given any details.
 Any information returned as to the cause of the error is a potential security issue where you may be leaking private
 details of your server architecture, configuration vulnerabilities, or specific library versions which could then be
 used to attack your application in a specific way.&lt;/p&gt;
@@ -393,7 +393,7 @@ you may define the input like this:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-Javascript&#34;&gt;{ Name: &amp;quot;New Name&amp;quot; }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Which when parsed, will result in &lt;code&gt;Name == &amp;quot;New Name&amp;quot;&lt;/code&gt; and &lt;code&gt;Email == &amp;quot;&amp;quot;&lt;/code&gt;.  You don&amp;rsquo;t know if the user meant to set their
+&lt;p&gt;Which, when parsed, will result in &lt;code&gt;Name == &amp;quot;New Name&amp;quot;&lt;/code&gt; and &lt;code&gt;Email == &amp;quot;&amp;quot;&lt;/code&gt;.  You don&amp;rsquo;t know if the user meant to set their
 email to &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; or if they simply didn&amp;rsquo;t specify any change to their Email.&lt;/p&gt;
 
 &lt;p&gt;You should instead define your input with pointers:&lt;/p&gt;
@@ -431,7 +431,7 @@ opinion it&amp;rsquo;s worth spending time getting this working as soon as possi
 
 &lt;h2 id=&#34;sync-pool&#34;&gt;sync.Pool&lt;/h2&gt;
 
-&lt;p&gt;Which each connection coming in on its own separate go-routine, the easiest way to write your code is create and destroy
+&lt;p&gt;When each connection comes in on its own separate go-routine, the easiest way to write your code is create and destroy
 everything you need within that go-routine.  This will work for a while, but eventually, if your request load starts
 increasing you&amp;rsquo;ll start running into issues with garbage collection.  Most of the time, the answer to that problem is
 &lt;code&gt;sync.Pool&lt;/code&gt;.&lt;/p&gt;
