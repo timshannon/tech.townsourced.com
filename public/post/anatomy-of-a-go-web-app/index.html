@@ -269,7 +269,7 @@ and the <a href="https://golang.org/pkg/encoding/json">encoding/json package</a>
 
 <p>You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
 package and its types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
-another way you shouldn&rsquo;t need to import http in <em>any</em> other packages except this one.  Preventing the http package from
+another way, you shouldn&rsquo;t need to import http in <em>any</em> other packages except this one.  Preventing the http package from
 leaking into other packages will help keep the responsibilities of http handling clearly defined <em>only</em> in the web package.</p>
 
 <h2 id="the-app-package">The App Package</h2>

@@ -172,7 +172,7 @@ and the [encoding/json package](https://golang.org/pkg/encoding/json") for any R
 
 You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
 package and its types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
-another way you shouldn't need to import http in *any* other packages except this one.  Preventing the http package from 
+another way, you shouldn't need to import http in *any* other packages except this one.  Preventing the http package from 
 leaking into other packages will help keep the responsibilities of http handling clearly defined *only* in the web package.
 
 ## The App Package
