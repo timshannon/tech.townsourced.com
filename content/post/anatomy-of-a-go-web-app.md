@@ -313,7 +313,7 @@ http has already given us status code ranges to differentiate between the two ty
 If the user breaks the system by putting in bad input using the web application in a way that wasn't intended, they should
 be notified of the mistake with a clear explanation of what went wrong and how.  I refer to these errors as **Failures**.
 
-If the system breaks (due to network, hardware, or system design issues) the user should *not* be given any details.  
+If the system breaks (due to network, hardware, or system design issues) the user should *not* be given any details. 
 Any information returned as to the cause of the error is a potential security issue where you may be leaking private
 details of your server architecture, configuration vulnerabilities, or specific library versions which could then be
 used to attack your application in a specific way.
@@ -391,7 +391,7 @@ If a user just wants to update their Name and not their Email, they'll send some
 { Name: "New Name" }
 ```
 
-Which when parsed, will result in `Name == "New Name"` and `Email == ""`.  You don't know if the user meant to set their
+Which, when parsed, will result in `Name == "New Name"` and `Email == ""`.  You don't know if the user meant to set their
 email to `""` or if they simply didn't specify any change to their Email.
 
 You should instead define your input with pointers:
@@ -431,7 +431,7 @@ func (t templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 ## sync.Pool
 
-Which each connection coming in on its own separate go-routine, the easiest way to write your code is create and destroy
+When each connection comes in on its own separate go-routine, the easiest way to write your code is create and destroy
 everything you need within that go-routine.  This will work for a while, but eventually, if your request load starts 
 increasing you'll start running into issues with garbage collection.  Most of the time, the answer to that problem is 
 `sync.Pool`.
