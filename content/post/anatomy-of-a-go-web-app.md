@@ -8,10 +8,10 @@ tags = ["Go", "Web Development", "tutorial", "reference"]
 +++
 
 When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give 
-one more example of how you can go about building a web application in the Go language, as well as to give you and idea 
+one more example of how you can go about building a web application in the Go language, as well as to give you an idea 
 what things you need to start thinking about and plan for before you get started.
 
-This guide is not intended to exhaustive, nor is it absolute. It is a compendium of the things I thought about and how I dealt 
+This guide is not intended to be exhaustive, nor is it absolute. It is a compendium of the things I thought about and how I dealt 
 with them when building [townsourced.com](https://www.townsourced.com).  Hopefully you'll find it useful.
 
 <!--more-->
