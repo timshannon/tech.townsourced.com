@@ -1,7 +1,7 @@
 +++
 title = "Anatomy of a Go Web Application"
 draft = true
-date = "2016-11-16T16:53:07-06:00"
+date = "2016-12-04T10:37:07-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference"]
 
@@ -28,7 +28,7 @@ found, with web applications, these the 3 package delineations are required:
 There may be others, but for the most part your code will fall into one of these 3 packages, or sub-packages 
 within them.
 
-But before we get into packages, we need to setup the main entry point to our program.  In Go, this means `func main()`
+But, before we get into packages, we need to setup the main entry point to our program.  In Go, this means `func main()`
 and I usually put mine in `main.go`.
 
 ## main.go
@@ -83,7 +83,7 @@ Below is an example of townsourced's config file to give you an idea of the type
 }
 ```
 
-This configuration will usually be defined as separate structs in each package: `web.Config`, `app.Config`, and `data.Config`.
+I defined this configuration as separate structs in each package: `web.Config`, `app.Config`, and `data.Config`.
 You'll then load the configuration into these structs, and pass them into their respective packages. This is also a good 
 time to initialize any clients in those packages as well.  In Townsourced, this looks like the following:
 
@@ -152,7 +152,7 @@ func main() {
 
 	err = cfg.Write()
 	if err != nil {
-		app.Halt("Error writting config file to %s. Error: %s", cfg.FileName(), err)
+		app.Halt("Error writing config file to %s. Error: %s", cfg.FileName(), err)
 	}
 
 	err = data.Init(dataCfg)
@@ -172,8 +172,8 @@ and the [encoding/json package](https://golang.org/pkg/encoding/json") for any R
 
 You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
 package and it's types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
-another way you shouldn't need to import http in *any* other packages except this one.  Preventing http from leaking into
-other packages will help keep clear lines of responsibility between your packages.
+another way you shouldn't need to import http in *any* other packages except this one.  Preventing the http package from 
+leaking into other packages will help keep the responsibilities of http handling clearly defined *only* in the web package.
 
 ## The App Package
 
@@ -181,10 +181,10 @@ The **app** package is where the meat of your application will be.  Inside this 
 that will be passed to and from your other packages; types like `app.User` and `app.Session`.  The point of the app package
 is to validate and handle data within these types, so most of your code in the app package will be methods on types, or
 functions that return these types. Be conservative about which types and methods you choose to export.  The web package
-doesn't need to understand how an `app.User` is approved to see data, it just needs to know if they can or not.
+doesn't need to understand how an `app.User` is approved to see data, it just needs to know whether they can or not.
 
-More likely than not your application data will be related to each other.  Try to retrieve types from their relationship
-with other types rather than from stand alone functions.
+More likely than not your application data will be related to each other.  Try to retrieve types from their relationships
+with other types rather than from standalone functions.
 
 ```Go
 	//  instead of this
@@ -199,14 +199,14 @@ with other types rather than from stand alone functions.
 
 ```
 
-If standalone functions are necessary or make more sense (for instance when they don't actually modify any types), then 
-don't export them.
+If standalone functions are necessary or make more sense (for instance when they don't actually modify any type data), 
+then don't export them.
 
 If you aren't careful you may find yourself implementing parts of your application in the web or data layers when they
-should be in the app layer.  For example, access controls.
+should be in the app layer; for example, access controls.
 
-You may be tempted to check if a user has access at the web layer, but this type of access control should always be done
-at the app layer, where it can be easily unit tested.  
+You may be tempted to check if a user has access to some data at the web layer, but this type of access control should 
+always be done at the app layer, where it can be easily found, and unit tested.  
 
 ```Go
 // instead of this
@@ -236,9 +236,9 @@ func (u *User) Profile(who *User) (*ProfileData, error) {
 
 ## The Data Package
 
-The data package is for getting and setting data in your persistent or temporary storage.  There shouldn't be any types
-kept here unless they are types that augment the data layer.  For example, you shouldn't have a `User` or `Session`, but
-you may have a type called `UUID` that exists with the `app.User` or `app.Session` types.
+The data package is for getting and setting data in your persistent and temporary storage.  There shouldn't be any types
+kept here unless they are types that augment the data layer.  For example, you shouldn't see a `User` or `Session` in the
+data layer, but you may see a type called `UUID` that exists within the `app.User` or `app.Session` types.
 
 A specific example of this in [Townsourced](https://www.townsourced.com) is the `data.Version` type which looks like 
 this:
@@ -267,9 +267,9 @@ The real usefulness of `data.Version`, and the reason it exists in the `data` pa
 updates running in the data layer if the `vertag` being submitted by the user doesn't match the `vertag` in of the
 record in the database, preventing your users from updating an entry based on stale data.  
 
-In Townsourced, the code to determine when to invalidate and update *memcached* entries exists in the `data` layer, not
-the `app` layer.  The `app` layer shouldn't worry about how data is stored or retrieved, it should only concern itself 
-with the structure and behavior of it's types. 
+Another example of the data layer's responsibilities is cache invalidation. In Townsourced, the code to determine when to 
+invalidate and update *memcached* entries exists in the `data` layer, not the `app` layer.  The `app` layer shouldn't 
+worry about *how* data is stored or retrieved, it should only concern itself with the structure and behavior of its types. 
 
 ## Putting it all together
 
@@ -300,10 +300,12 @@ webapp
 
 # Error Handling
 
-Handling errors properly is important in any application, but especially so in web applications.  In web applications,
-errors tend to happen in one of two ways: the system broke, or the user broke the system.
+Handling errors properly is important in any application, but especially so in web applications where your users may be
+anyone from a 90 year old grandmother trying to get to facebook from your website, or a sophisticated hacker who's bored
+and looking for an easy target. 
 
-Conveniently http has already given us status codes to differentiate between the two types of errors:
+In web applications, errors tend to happen in one of two ways: the system broke or the user broke the system. Conveniently 
+http has already given us status code ranges to differentiate between the two types of errors:
 
 * Status 400 range - User Errors
 * Status 500 range - Server Errors
@@ -317,8 +319,9 @@ details of your server architecture, configuration vulnerabilities, or specific 
 used to attack your application in a specific way.
 
 To help manage which errors should be visible to users and which shouldn't, I usually create a `fail` package, which
-resides outside the existing packages.  Inside the `fail` package is the `fail.Fail` type which implements the 
-`error` interface, so it can be returned like a normal error.
+resides outside the existing packages. It exists outside the main packages, because failures may happen in any
+of them.  Inside the `fail` package is the `fail.Fail` type which implements the `error` interface, so it can be 
+returned like a normal error.
 
 ```Go
 type Fail struct {
@@ -372,8 +375,8 @@ default:
 
 When handling JSON input, such as for an API, be wary of Go's [zero values](https://golang.org/ref/spec#The_zero_value).
 In an API you need to be able to tell the difference between setting a value to a zero value, and not setting a value at 
-all. Consider the following scenario.  Let's say you have an API where the user can set their Name or the Email address,
-you may define that input like this:
+all. Consider the following scenario.  Let's say you have an API where the user can set their Name or the Email Address,
+you may define the input like this:
 
 ```Go
 type UserInput struct {
