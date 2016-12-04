@@ -35,7 +35,7 @@ and I usually put mine in `main.go`.
 
 `main.go` will be responsible for loading anything configurable in your web app and passing those configuration options
 into the other layers.  There are many different options for storing your app's configuration, personally I store mine 
-in json files using [small configuration library](https://github.com/timshannon/config) I wrote.  If you want many options
+in json files using a [small configuration library](https://github.com/timshannon/config) I wrote.  If you want many options
 including environment variables, TOML, YAML, or JSON , check out  Steve Francia's excellent [Viper library](https://github.com/spf13/viper).
 
 Below is an example of townsourced's config file to give you an idea of the types of options you may put in there:
