@@ -1,6 +1,6 @@
 +++
 title = "Anatomy of a Go Web Application"
-draft = true
+draft = false
 date = "2016-12-04T10:37:07-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference"]
@@ -171,7 +171,7 @@ The **web** package is the client's entry point to your application.  Here you w
 and the [encoding/json package](https://golang.org/pkg/encoding/json") for any REST APIs.
 
 You will process cookies at this level and pass already extracted session identifies to your application layer.  The http
-package and it's types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
+package and its types and interfaces (requests, writers, cookies, etc.) should never leave this package.  Or to put it
 another way you shouldn't need to import http in *any* other packages except this one.  Preventing the http package from 
 leaking into other packages will help keep the responsibilities of http handling clearly defined *only* in the web package.
 
@@ -263,7 +263,7 @@ type User struct {
 
 ```
 
-The real usefulness of `data.Version`, and the reason it exists in the `data` package is it's ability to prevent any
+The real usefulness of `data.Version`, and the reason it exists in the `data` package is its ability to prevent any
 updates running in the data layer if the `vertag` being submitted by the user doesn't match the `vertag` in of the
 record in the database, preventing your users from updating an entry based on stale data.  
 
@@ -414,12 +414,12 @@ Be careful to check each input though, so you don't run into any nil pointer pan
 
 ## Development
 
-When developing, you need to have immediate feedback to the changes you're making.  This means seeing the results of your
-work without having to restart your web server.  For this reason it's important to create a *dev mode* in your application
-that can be turned on via a command line flag, or environment variable.  Once set you can use this variable to rebuild
-templates on every request, reload files on every request, watch for file changes and auto-reload the web page. You'd
-be surprised how much your productivity can suffer with a long write and evaluate loop.  In my opinion it's worth spending
-time getting this working as soon as possible.
+When developing your web application, you need to see immediate feedback from the changes you're making.  This means seeing
+the results of your work without having to restart your web server.  For this reason it's important to create a *dev mode* 
+in your application that can be turned on via a command line flag, or environment variable.  Once set, you can use this 
+variable to rebuild templates on every request, reload files on every request, watch for file changes and auto-reload 
+the web page. You'd be surprised how much your productivity can suffer with a long write and evaluate loop.  In my 
+opinion it's worth spending time getting this working as soon as possible.
 
 ```Go
 func (t templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -431,16 +431,17 @@ func (t templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 ## sync.Pool
 
-Which each connection coming in on it's own separate go-routine, the easiest way to write you code is create and destroy
-everything you need in that go-routine.  This will work for a while, but eventually, if your requests start increasing
-you'll start running into issues with garbage collection.  Most of the time, the answer to that problem is `sync.Pool`.
+Which each connection coming in on its own separate go-routine, the easiest way to write your code is create and destroy
+everything you need within that go-routine.  This will work for a while, but eventually, if your request load starts 
+increasing you'll start running into issues with garbage collection.  Most of the time, the answer to that problem is 
+`sync.Pool`.
 
-For example, if you want to gzip every response, your first pass may have to creating a new gzip writer on every request.
+For example, if you want to gzip every response, your first pass may have you creating a new gzip writer on every request.
 If your server gets a huge spike in traffic, then your server will be spending a lot of time reclaiming unused gzip writers
 when things start to die down.  
 
-Instead, use `sync.Pool` to instantiate your gzip writers, and when you're done with them, put them back in the pool to
-be reused, instead of garbage collected.
+Instead, you can use `sync.Pool` to instantiate your gzip writers, and when you're done with them, put them back in the 
+pool to be reused, instead of garbage collected.
 
 ```Go
 func init() {
