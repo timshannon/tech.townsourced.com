@@ -4,7 +4,7 @@ draft = false
 date = "2016-12-04T10:37:07-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference"]
-
+keywords = ["web development", "go", "golang", "backend development"]
 +++
 
 When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give 
@@ -501,5 +501,7 @@ as a base to refer to in future posts about more specific aspects of web applica
 
 I hope you find this post useful, and if you have any corrections, questions, or suggestions for future posts, let me 
 know in the comments below.
+
+\* edit [Part 2: Authentication](/post/anatomy-of-a-go-web-app-authentication) has since been written.
 
 
