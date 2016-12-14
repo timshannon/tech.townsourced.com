@@ -128,6 +128,65 @@ Recommended reading:
 ### Implementation
 
 
+```Go
+/// UserLogin logs in a user via their password and either their username or email
+func UserLogin(usernameOrEmail, password string) (*User, error) {
+	u := &User{}
+	if strings.Contains(usernameOrEmail, "@") {
+		//login with email
+		err := data.UserGetEmail(u, usernameOrEmail)
+		if err == data.ErrNotFound {
+			return nil, ErrUserEmailNotFound // can test for email, but not username
+		}
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// login with username
+		err := data.UserGet(u, data.NewKey(usernameOrEmail))
+		if err == data.ErrNotFound {
+			// don't expose that user doesn't exist
+			// a bad password and an incorrect username should look the same
+			return nil, ErrUserLogonFailure 
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	if u.HasPassword == false || len(u.Password) == 0 {
+		//User isn't a password based user, and can't login with a password
+		// they need to use facebook/google/twitter
+		return nil, ErrUserLogonFailure
+	}
+	err := u.login(password)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (u *User) login(password string) error {
+	if !u.HasPassword || len(u.Password) == 0 {
+		if u.GoogleID == "" && u.FacebookID == "" && u.TwitterID == "" {
+			return ErrUserLogonFailure
+		}
+		// Can't auth password for non-password based users
+		return nil
+	}
+	// sha512 password and compare
+	err := bcrypt.CompareHashAndPassword(u.Password, []byte(password))
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return ErrUserLogonFailure
+		}
+		return err
+	}
+	return nil
+}
+```
+
+### Password Resets / Forgotten Passwords
+
 
 
 ---
@@ -145,5 +204,4 @@ Recommended reading:
 	* Logging out
 	* Expiration
 * No password hints or security questions
-* New NIST guidelines are a good starting point: https://nakedsecurity.sophos.com/2016/08/18/nists-new-password-rules-what-you-need-to-know/
 
