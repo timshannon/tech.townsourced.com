@@ -113,7 +113,7 @@ my password requirements.
 2. Password should not be on the top 1,000 (or more) most common passwords list
 	* Load a text file during the `Init()` of your [app layer](/post/anatomy-of-a-go-web-app/#the-app-package) and
 	test new passwords against it.
-	* Update the password file yearly. A good source I've found is [here](https://github.com/danielmiessler/SecLists/tree/master/Passwords).
+	* Update the password file yearly. A good source I've found is [here](https://github.com/robsheldon/bad-passwords-index).
 
 Thats it. 
 
