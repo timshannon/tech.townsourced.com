@@ -1,7 +1,7 @@
 +++
 title = "Anatomy of a Go Web App - Part 2: Authentication"
 draft = true
-date = "2016-12-08T19:05:51-06:00"
+date = "2016-12-23T19:05:51-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference"]
 keywords = ["web development", "go", "golang", "backend development", "passwords", "oauth", "security", "best practice"]
@@ -127,6 +127,21 @@ Recommended reading:
 
 ### Implementation
 
+There is a lot of discussion around whether you should hash your passwords using bcrypt or scrypt, if you are debating
+between these two, then you are off to a good start.  [Yahoo](https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users) 
+was apparently using MD5.  Personally I went with bcrypt, but both scrypt and bcrypt give you good protections against
+modern attacks (with the ability to increase the work factor), while doing away with unneeded aspects of password management
+like salting.
+
+However, there is one aspect of bcrypt and scrypt that you need to be careful of.  By their very nature, these hashing
+algorithms take time and resources to process.  They do this to make it hard to run large dictionary attacks.  But this
+also leaves your web application vulnerable to a potential denial of service attack if a user submits a very large
+password.  To protect against this, you could set a max possible length for user's passwords, but that goes in the face
+of the rule above: *Long passwords are better than complex passwords*.  Instead we can pass the password through a sha512 
+sum, to guarantee that only 512 bits ever get passed through bcrypt or scrypt.
+
+
+Below is the implementation of this (with the optional 3rd party authentication) in [townsourced](https://www.townsourced.com).
 
 ```Go
 /// UserLogin logs in a user via their password and either their username or email
@@ -173,8 +188,11 @@ func (u *User) login(password string) error {
 		// Can't auth password for non-password based users
 		return nil
 	}
+
 	// sha512 password and compare
-	err := bcrypt.CompareHashAndPassword(u.Password, []byte(password))
+	shaPass := sha512.Sum512([]byte(password))
+
+	err := bcrypt.CompareHashAndPassword(u.Password, shaPass)
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			return ErrUserLogonFailure
@@ -185,18 +203,36 @@ func (u *User) login(password string) error {
 }
 ```
 
+Dropbox does something similar with their passwords, and they have a good writeup of their implementation here:
+https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/.
+
 ### Password Resets / Forgotten Passwords
 
+Notice above, how there is no mention of security questions, or password hints.  This is on purpose.  Some of the biggest,
+most public "hacks" that you'll read about online are almost always due to taking advantage of security questions.  The
+much safer, and simpler way for users to recover passwords is to use a recovery email request.
 
+Generate a unique random token (make sure to use [crypto/rand](https://golang.org/pkg/crypto/rand/) not 
+[math/rand](https://golang.org/pkg/math/rand/)) and email it to the *previously verified* email address of your user. 
+In the email have the unique token passed through a URL that triggers a password reset if the token is valid.  Tokens 
+should be usable once only, and should eventually expire if not used.
+
+```Go
+//Random returns a random, url safe value of the bit length passed in
+func Random(bits int) string {
+	result := make([]byte, bits/8)
+	_, err := io.ReadFull(rand.Reader, result)
+	if err != nil {
+		panic(fmt.Sprintf("Error generating random values: %v", err))
+	}
+	return base64.RawURLEncoding.EncodeToString(result)
+}
+```
+
+## Session Management
 
 ---
 
-* Authentication
-  * Password
-    * sha512 + bcrypt
-    * Ideal minimum length 12, more reasonable min length 8, no max (sha512), length over complexity
-    * Check matches against top common passwords list (https://github.com/danielmiessler/SecLists/tree/master/Passwords)
-  * Accept Username or Email logins
 * Session Management
 	* Cookies
 	* Remember Me
