@@ -3,7 +3,7 @@ title = "Anatomy of a Go Web App - Part 2: Authentication"
 draft = true
 date = "2016-12-23T19:05:51-06:00"
 categories = ["Development"]
-tags = ["Go", "Web Development", "tutorial", "reference"]
+tags = ["Go", "Web Development", "tutorial", "reference", "authentication"]
 keywords = ["web development", "go", "golang", "backend development", "passwords", "oauth", "security", "best practice"]
 +++
 
@@ -48,6 +48,11 @@ uses *OAUTH1.0A*, so you'll need to make sure you use a library built for it lik
 Each of the **Big Three** have a unique user identifier that you can store with your [user record](/post/anatomy-of-a-go-web-app/#the-app-package).
 
 ```Go
+package app
+
+...
+
+
 type User struct {
 	Username       data.Key        
 	Email          string          
@@ -61,6 +66,11 @@ type User struct {
 
 And once that's in place, you can do something like this:
 ```Go
+package app
+
+...
+
+
 // FacebookUser gets a user (if possible) from the passed in facebook code
 func FacebookUser(redirectURI, code string) (*User, error) {
 	fbSes, err := facebookGetSession(redirectURI, code)
@@ -144,6 +154,11 @@ sum, to guarantee that only 512 bits ever get passed through bcrypt or scrypt.
 Below is the implementation of this (with the optional 3rd party authentication) in [townsourced](https://www.townsourced.com).
 
 ```Go
+package app
+
+...
+
+
 /// UserLogin logs in a user via their password and either their username or email
 func UserLogin(usernameOrEmail, password string) (*User, error) {
 	u := &User{}
@@ -231,13 +246,165 @@ func Random(bits int) string {
 
 ## Session Management
 
+Now that you've authenticated your user, you'll want to create a session so that they don't need to re-login on every
+request.  Just like with forgotten passwords and OAUTH, you'll be creating a unique, cryptographically random, and expire-
+able token to identify a session.  You'll store that token in a cookie in the browser, and force an early expiration
+when the user logs out.
+
+
+Here's what my complete Session type looks like in [townsourced](https://www.townsourced.com).  You'll notice there is 
+a bit more in there besides just the token (SessionID) and expiration.
+
+```Go
+package app
+
+...
+
+
+// Session is an authenticated session into townsourced
+type Session struct {
+	Key       string //userkey+sessionID 
+	UserKey   data.Key
+	SessionID string  
+	CSRFToken string
+	Valid     bool
+	Expires   time.Time
+	When      time.Time
+	IPAddress string
+	UserAgent string
+
+
+	user *User // cached user struct, to prevent repeated DB lookups
+}
+```
+
+After a user successfully authenticates, you can create a new session and store it in your database.  This session will
+be looked up on every request, so if you run into performance issues, you should consider storing it in a caching layer.
+In townsourced, I used [memcached](https://memcached.org/), but there are many options available, just as long as the 
+caching layer is available to *all* of your web servers, otherwise if a user gets load-balanced to a different web 
+server, it'll look like they've been logged out.
+
+```Go
+package app
+
+...
+
+// SessionNew generates a new session for the passed in user
+func SessionNew(user *User, expires time.Time, ipAddress, userAgent string) (*Session, error) {
+	if expires.IsZero() {
+		expires = time.Now().AddDate(0, 0, 3) // default expiration
+	}
+	s := &Session{
+		UserKey:   user.Username,
+		SessionID: Random(128),
+		CSRFToken: Random(256),
+		Valid:     true,
+		Expires:   expires,
+		When:      time.Now(),
+		IPAddress: ipAddress,
+		UserAgent: userAgent,
+	}
+
+	s.Key = string(s.UserKey) + "_" + s.SessionID
+	err := data.SessionInsert(s, s.Key, s.Expires)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+```
+
+Once your session is created in the back-end, you can store your new session in a cookie in the user's browser.
+
+```Go
+package web
+
+...
+
+func setSessionCookie(w http.ResponseWriter, r *http.Request, u *app.User, rememberMe bool) error {
+	expires := time.Time{}
+	if rememberMe {
+		expires = time.Now().AddDate(0, 0, 15)
+	}
+	s, err := app.SessionNew(u, expires, ipAddress(r), r.UserAgent())
+	if err != nil {
+		return err
+	}
+	cookie := &http.Cookie{
+		Name:     cookieName, // const of your app name
+		Value:    s.Key,
+		HttpOnly: true, // Important
+		Path:     "/",
+		Secure:   isSSL, // global var set if running ssl
+		Expires:  expires,
+	}
+	http.SetCookie(w, cookie)
+	return nil
+}
+
+
+```
+
+And then on each request, you can check if the session is valid:
+
+```Go
+package web
+
+...
+
+// get a session from the request
+func session(r *http.Request) (*app.Session, error) {
+	// must iter through all cookies because you can have
+	// multiple cookies with the same name
+	// the cookie is valid only if the name matches AND it has a value
+	cookies := r.Cookies()
+	cValue := ""
+	for i := range cookies {
+		if cookies[i].Name == cookieName {
+			if cookies[i].Value != "" {
+				cValue = cookies[i].Value
+			}
+		}
+	}
+	if cValue == "" {
+		return nil, nil
+	}
+	s, err := app.SessionGet(cValue)
+	if err == app.ErrSessionInvalid {
+		return nil, nil
+	}
+	return s, err
+}
+
+...
+
+package app
+
+...
+
+// SessionGet retrieves a session
+func SessionGet(sessionKey string) (*Session, error) {
+	s := &Session{}
+	err := data.SessionGet(s, sessionKey)
+	if err == data.ErrNotFound {
+		return nil, ErrSessionInvalid
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !s.Valid || s.Expires.Before(time.Now()) {
+		return nil, ErrSessionInvalid
+	}
+	return s, nil
+}
+```
+
+
 ---
 
 * Session Management
 	* Cookies
 	* Remember Me
-	* Forgot Password
 	* Logging out
 	* Expiration
-* No password hints or security questions
 
