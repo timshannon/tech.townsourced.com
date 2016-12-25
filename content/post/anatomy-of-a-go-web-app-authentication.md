@@ -333,7 +333,7 @@ func setSessionCookie(w http.ResponseWriter, r *http.Request, u *app.User, remem
 	cookie := &http.Cookie{
 		Name:     cookieName, // const of your app name
 		Value:    s.Key,
-		HttpOnly: true, // Important
+		HttpOnly: true, 
 		Path:     "/",
 		Secure:   isSSL, // global var set if running ssl
 		Expires:  expires,
@@ -399,12 +399,46 @@ func SessionGet(sessionKey string) (*Session, error) {
 }
 ```
 
+Note how you track expiration on both the client *and* the server.  Never trust anything from the client.
 
----
+If the client wants to log off, you simply expire the session early (or mark it invalid if you want to preserve the 
+original expiration date).
 
-* Session Management
-	* Cookies
-	* Remember Me
-	* Logging out
-	* Expiration
+```Go
+func logout (w http.ResponseWriter, r *http.Request, s *app.Session) {
+	cookie, err := r.Cookie(cookieName)
+	if err != http.ErrNoCookie {
+		if cookie.Value == s.Key {
+			// clear value, and set maxAge: 0
+			cookie := &http.Cookie{
+				Name:     cookieName,
+				Value:    "",
+				HttpOnly: true,
+				Path:     "/",
+				Secure:   isSSL,
+				MaxAge:   0,
+			}
+			http.SetCookie(w, cookie)
+		}
+	}
 
+	if errHandled(c.session.Logout(), w, r, c) {
+		return
+	}
+}
+
+// Logout logs out of a session
+func (s *Session) Logout() error {
+	s.Valid = false
+	return s.put()
+}
+
+```
+
+That's it.  You should have the basics of managing user authentication in a Go web app.  If you skimmed this post, your 
+biggest takeaway should be to not manage passwords, or at the very least, provide your users with the more secure option
+of using Facebook, Google, or Twitter to authenticate with your app.
+
+The specifics of this post were requested on [reddit](https://www.reddit.com/r/golang/comments/5h6rvh/anatomy_of_a_go_web_application/), 
+so if there are any other topics you'd like covered, or if you found this post helpful, feel free to leave me a comment, 
+or shoot me a message.  
