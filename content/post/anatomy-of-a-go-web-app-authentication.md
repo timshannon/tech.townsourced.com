@@ -1,17 +1,17 @@
 +++
 title = "Anatomy of a Go Web App - Part 2: Authentication"
-draft = true
+draft = false
 date = "2016-12-23T19:05:51-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference", "authentication"]
 keywords = ["web development", "go", "golang", "backend development", "passwords", "oauth", "security", "best practice"]
 +++
 
-This is part two of set of posts breaking down some of the decisions I made when putting together the web server for
+This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for
 [townsourced](https://www.townsourced.com).  The first part is [here](/post/anatomy-of-a-go-web-app/).
 
-Instead of a general overview, like part one, this post will focus specifically on **User Authentication**, i.e. how to handle
-passwords (if at all) and session management.
+Instead of a general overview, like part one, this post will focus specifically on **User Authentication**, i.e. how to 
+handle passwords (if at all) and session management.
 
 <!--more-->
 
@@ -21,13 +21,14 @@ The best, and most secure system for managing passwords in a web app is *not to 
 and bulletproof password system is still vulnerable to your user's fallibility, and as you'll see when we go over password
 management below, most of the work goes into trying to protect the users from themselves.
 
+So, how do you get out of the password management business?  You offload the work to trusted third parties.  This usually
+means integrating [OAUTH](https://en.wikipedia.org/wiki/OAuth) into your authentication code. 
+
 ## OAUTH
 
-So, how do you get out of the password management business?  You offload the work to trusted 3rd parties.  This usually
-means integrating [OAUTH](https://en.wikipedia.org/wiki/OAuth) into your authentication code.  You'll want to use popular
-3rd parties through which your users will probably already have accounts setup. My policy is to give users as many options
-as possible so that the simplest option for them is to *not* create a password in my app.  This means adding OAUTH 
-support for one or more of the **Big Three**.
+You'll want to use popular third parties through which your users will probably already have accounts set up. My policy is 
+to give users as many options as possible so that the simplest option for them is to *not* create a password in my app.  
+This means adding OAUTH support for one or more of the **Big Three**.
 
 * **Facebook**: [Manually Build a Login Flow](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow)
 * **Google**: [Google Sign-In for server-side apps](https://developers.google.com/identity/sign-in/web/server-side-flow)
@@ -105,19 +106,19 @@ to build a new user.
 
 ## Passwords
 
-If for some reason your user does not want to use a 3rd party login, or you aren't permitted to offer them in your app
-(for instance internal apps), you'll need to securely manage your user's passwords.
+If for some reason your user does not want to use a third party login, or you aren't permitted to offer them in your app
+(for instance internal, non-internet facing apps), you'll need to securely manage your user's passwords.
 
 ### Requirements
 
 There is a lot of discussion, and argument over password best practices, and I highly recommend doing your own research,
-and getting a good understanding of the implications of some of these decisions.  Once again, the best option is to 
-*not to manage passwords at all*. That being said, here is a short list of best practices I try to meet when setting 
-my password requirements.
+and getting a good understanding of the implications of some of these decisions before starting.  Once again, the best 
+option is to *not to manage passwords at all*. That being said, here is a short list of best practices I try to meet when 
+setting my password requirements.
 
 1. Longer passwords are better than complex passwords
-	* Skip doing any complexity checks, or requiring a minimum level of entropy, or at least one number, 
-	or special symbol, etc
+	* Skip doing any complexity checks, or requiring a minimum level of entropy, or at least one number, special 
+	symbols, etc
 	* Minimum password length should be 10, or even better 12 (as of 2016).
 	* No max length (more on handling that later)
 2. Password should not be on the top 1,000 (or more) most common passwords list
@@ -127,8 +128,8 @@ my password requirements.
 
 Thats it. 
 
-Simple requirements are easier for your users to understand, easier for you to manage, and easier for you to
-rip out and rewrite when technology inevitably changes.
+Simple requirements are easier for your users to understand, easier for you to manage, and easier for you to rip out and 
+rewrite when technology inevitably changes.
 
 Recommended reading:
 
@@ -137,7 +138,7 @@ Recommended reading:
 
 ### Implementation
 
-There is a lot of discussion around whether you should hash your passwords using bcrypt or scrypt, if you are debating
+There are a lot of discussions around whether you should hash your passwords using bcrypt or scrypt.  If you are debating
 between these two, then you are off to a good start.  [Yahoo](https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users) 
 was apparently using MD5.  Personally I went with bcrypt, but both scrypt and bcrypt give you good protections against
 modern attacks (with the ability to increase the work factor), while doing away with unneeded aspects of password management
@@ -147,11 +148,11 @@ However, there is one aspect of bcrypt and scrypt that you need to be careful of
 algorithms take time and resources to process.  They do this to make it hard to run large dictionary attacks.  But this
 also leaves your web application vulnerable to a potential denial of service attack if a user submits a very large
 password.  To protect against this, you could set a max possible length for user's passwords, but that goes in the face
-of the rule above: *Long passwords are better than complex passwords*.  Instead we can pass the password through a sha512 
-sum, to guarantee that only 512 bits ever get passed through bcrypt or scrypt.
+of the rule above: *Long passwords are better than complex passwords*.  Instead, we can pass the password through a sha512 
+sum, to guarantee that only 512 bits ever get passed through to bcrypt or scrypt.
 
 
-Below is the implementation of this (with the optional 3rd party authentication) in [townsourced](https://www.townsourced.com).
+Below is the implementation of this (with the optional third party authentication) in [townsourced](https://www.townsourced.com).
 
 ```Go
 package app
@@ -224,8 +225,9 @@ https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-password
 ### Password Resets / Forgotten Passwords
 
 Notice above, how there is no mention of security questions, or password hints.  This is on purpose.  Some of the biggest,
-most public "hacks" that you'll read about online are almost always due to taking advantage of security questions.  The
-much safer, and simpler way for users to recover passwords is to use a recovery email request.
+most public "hacks" that you'll read about online are almost always due to taking over accounts by looking up or guessing
+answers to security questions.  The much safer, and simpler way for users to recover passwords is to use a recovery email 
+request.
 
 Generate a unique random token (make sure to use [crypto/rand](https://golang.org/pkg/crypto/rand/) not 
 [math/rand](https://golang.org/pkg/math/rand/)) and email it to the *previously verified* email address of your user. 
@@ -251,8 +253,7 @@ request.  Just like with forgotten passwords and OAUTH, you'll be creating a uni
 able token to identify a session.  You'll store that token in a cookie in the browser, and force an early expiration
 when the user logs out.
 
-
-Here's what my complete Session type looks like in [townsourced](https://www.townsourced.com).  You'll notice there is 
+Here's what the complete Session type looks like in [townsourced](https://www.townsourced.com).  You'll notice there is 
 a bit more in there besides just the token (SessionID) and expiration.
 
 ```Go
@@ -405,6 +406,8 @@ If the client wants to log off, you simply expire the session early (or mark it 
 original expiration date).
 
 ```Go
+package web
+
 func logout (w http.ResponseWriter, r *http.Request, s *app.Session) {
 	cookie, err := r.Cookie(cookieName)
 	if err != http.ErrNoCookie {
@@ -426,6 +429,10 @@ func logout (w http.ResponseWriter, r *http.Request, s *app.Session) {
 		return
 	}
 }
+
+...
+
+package app
 
 // Logout logs out of a session
 func (s *Session) Logout() error {
