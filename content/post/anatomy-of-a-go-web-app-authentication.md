@@ -1,7 +1,7 @@
 +++
 title = "Anatomy of a Go Web App - Part 2: Authentication"
 draft = false
-date = "2016-12-23T19:05:51-06:00"
+date = "2017-01-15T19:05:51-06:00"
 categories = ["Development"]
 tags = ["Go", "Web Development", "tutorial", "reference", "authentication"]
 keywords = ["web development", "go", "golang", "backend development", "passwords", "oauth", "security", "best practice"]
