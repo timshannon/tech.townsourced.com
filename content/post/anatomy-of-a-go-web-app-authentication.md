@@ -99,27 +99,27 @@ func FacebookUser(redirectURI, code string) (*User, error) {
 } 
 ```
 
-Your Google and Twitter functions will look very similar.  Check if a user already exists, associated to the given 
-third party credentials, and if so, log them in, otherwise use the information shared (or accessible via some other API)
-to build a new user.
-
+Your Google and Twitter functions will look very similar.  Check if a user already exists for the given third party 
+credentials. If so, log them in, otherwise use the information shared (or accessible via some other API) to build a new 
+user.
 
 ## Passwords
 
 If for some reason your user does not want to use a third party login, or you aren't permitted to offer them in your app
-(for instance internal, non-internet facing apps), you'll need to securely manage your user's passwords.
+(for instance internal, non-internet facing apps), you'll need to securely manage your users' passwords.
 
 ### Requirements
 
-There is a lot of discussion, and argument over password best practices, and I highly recommend doing your own research,
-and getting a good understanding of the implications of some of these decisions before starting.  Once again, the best 
+There is a lot of discussion, and argument over password best practices.  I highly recommend doing your own research,
+to get a better understanding of the implications of some of these decisions before you start.  Once again, the best 
 option is to *not to manage passwords at all*. That being said, here is a short list of best practices I try to meet when 
 setting my password requirements.
 
 1. Longer passwords are better than complex passwords
-	* Skip doing any complexity checks, or requiring a minimum level of entropy, or at least one number, special 
-	symbols, etc
-	* Minimum password length should be 10, or even better 12 (as of 2016).
+	* Skip doing any complexity checks 
+		* Don't require a minimum level of entropy
+		* Don't require at least one number or special symbols, etc
+	* Minimum password length should be 10, or even better 12 ([as of 2015](https://blog.codinghorror.com/your-password-is-too-damn-short/))
 	* No max length (more on handling that later)
 2. Password should not be on the top 1,000 (or more) most common passwords list
 	* Load a text file during the `Init()` of your [app layer](/post/anatomy-of-a-go-web-app/#the-app-package) and
@@ -138,8 +138,8 @@ Recommended reading:
 
 ### Implementation
 
-There are a lot of discussions around whether you should hash your passwords using bcrypt or scrypt.  If you are debating
-between these two, then you are off to a good start.  [Yahoo](https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users) 
+Once again, there is a lot of discussion around whether you should hash your passwords using bcrypt or scrypt.  If you 
+are debating between these two, then you are off to a good start.  [Yahoo](https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users) 
 was apparently using MD5.  Personally I went with bcrypt, but both scrypt and bcrypt give you good protections against
 modern attacks (with the ability to increase the work factor), while doing away with unneeded aspects of password management
 like salting.
