@@ -7,8 +7,460 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
-    <lastBuildDate>Sun, 04 Dec 2016 10:37:07 -0600</lastBuildDate>
+    <lastBuildDate>Sun, 15 Jan 2017 19:05:51 -0600</lastBuildDate>
     <atom:link href="http://tech.townsourced.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Anatomy of a Go Web App - Part 2: Authentication</title>
+      <link>http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</link>
+      <pubDate>Sun, 15 Jan 2017 19:05:51 -0600</pubDate>
+      
+      <guid>http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</guid>
+      <description>&lt;p&gt;This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for
+&lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.  The first part is &lt;a href=&#34;http://tech.townsourced.com/post/anatomy-of-a-go-web-app/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Instead of a general overview, like part one, this post will focus specifically on &lt;strong&gt;User Authentication&lt;/strong&gt;, i.e. how to
+handle passwords (if at all) and session management.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;password-management&#34;&gt;Password Management&lt;/h1&gt;
+
+&lt;p&gt;The best, and most secure system for managing passwords in a web app is &lt;em&gt;not to manage passwords at all&lt;/em&gt;.  The most secure
+and bulletproof password system is still vulnerable to your user&amp;rsquo;s fallibility, and as you&amp;rsquo;ll see when we go over password
+management below, most of the work goes into trying to protect the users from themselves.&lt;/p&gt;
+
+&lt;p&gt;So, how do you get out of the password management business?  You offload the work to trusted third parties.  This usually
+means integrating &lt;a href=&#34;https://en.wikipedia.org/wiki/OAuth&#34;&gt;OAUTH&lt;/a&gt; into your authentication code.&lt;/p&gt;
+
+&lt;h2 id=&#34;oauth&#34;&gt;OAUTH&lt;/h2&gt;
+
+&lt;p&gt;You&amp;rsquo;ll want to use popular third parties through which your users will probably already have accounts set up. My policy is
+to give users as many options as possible so that the simplest option for them is to &lt;em&gt;not&lt;/em&gt; create a password in my app.&lt;br /&gt;
+This means adding OAUTH support for one or more of the &lt;strong&gt;Big Three&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Facebook&lt;/strong&gt;: &lt;a href=&#34;https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow&#34;&gt;Manually Build a Login Flow&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Google&lt;/strong&gt;: &lt;a href=&#34;https://developers.google.com/identity/sign-in/web/server-side-flow&#34;&gt;Google Sign-In for server-side apps&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Twitter&lt;/strong&gt;: &lt;a href=&#34;https://dev.twitter.com/web/sign-in/implementing&#34;&gt;Implementing Sign in with Twitter&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This will not be a detailed overview of implementing OAUTH, there are
+&lt;a href=&#34;https://aaronparecki.com/2012/07/29/2/oauth2-simplified&#34;&gt;better articles&lt;/a&gt; out there for that.  I will, however, step
+you through the pieces you need to have in place in order to get it working.  A very high level overview of OAUTH looks
+like this (courtesy of Google):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://tech.townsourced.com/images/post/anatomy-of-a-go-web-app-authentication/server_side_code_flow.png&#34; alt=&#34;OAUTH2 Server Side Flow&#34; title=&#34;Server Side Code Flow&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Facebook and Google are very similar, and you should be able to get by with a standard
+&lt;a href=&#34;https://github.com/golang/oauth2&#34;&gt;OAUTH2 library&lt;/a&gt; (with a little bit of tweaking).  Twitter, on the other hand, actually
+uses &lt;em&gt;OAUTH1.0A&lt;/em&gt;, so you&amp;rsquo;ll need to make sure you use a library built for it like
+&lt;a href=&#34;https://github.com/mrjones/oauth&#34;&gt;https://github.com/mrjones/oauth&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Each of the &lt;strong&gt;Big Three&lt;/strong&gt; have a unique user identifier that you can store with your &lt;a href=&#34;http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package&#34;&gt;user record&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package app
+
+...
+
+
+type User struct {
+	Username       data.Key        
+	Email          string          
+	...
+	GoogleID       string         
+	FacebookID     string        
+	TwitterID      string       
+	...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And once that&amp;rsquo;s in place, you can do something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package app
+
+...
+
+
+// FacebookUser gets a user (if possible) from the passed in facebook code
+func FacebookUser(redirectURI, code string) (*User, error) {
+	fbSes, err := facebookGetSession(redirectURI, code)
+	if err != nil {
+		return nil, err
+	}
+	//Lookup user in the database
+	usr, err := userGetFacebook(fbSes.userID)
+	if err == ErrUserNotFound {
+		data, err := fbSes.userData()
+		if err != nil {
+			return nil, err
+		}
+
+		// Create new user from Facebook data
+		...
+		return newUser, ErrUserNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	// Return user and log them in
+	return usr, nil
+} 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Your Google and Twitter functions will look very similar.  Check if a user already exists, associated to the given
+third party credentials, and if so, log them in, otherwise use the information shared (or accessible via some other API)
+to build a new user.&lt;/p&gt;
+
+&lt;h2 id=&#34;passwords&#34;&gt;Passwords&lt;/h2&gt;
+
+&lt;p&gt;If for some reason your user does not want to use a third party login, or you aren&amp;rsquo;t permitted to offer them in your app
+(for instance internal, non-internet facing apps), you&amp;rsquo;ll need to securely manage your user&amp;rsquo;s passwords.&lt;/p&gt;
+
+&lt;h3 id=&#34;requirements&#34;&gt;Requirements&lt;/h3&gt;
+
+&lt;p&gt;There is a lot of discussion, and argument over password best practices, and I highly recommend doing your own research,
+and getting a good understanding of the implications of some of these decisions before starting.  Once again, the best
+option is to &lt;em&gt;not to manage passwords at all&lt;/em&gt;. That being said, here is a short list of best practices I try to meet when
+setting my password requirements.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Longer passwords are better than complex passwords
+
+&lt;ul&gt;
+&lt;li&gt;Skip doing any complexity checks, or requiring a minimum level of entropy, or at least one number, special
+symbols, etc&lt;/li&gt;
+&lt;li&gt;Minimum password length should be 10, or even better 12 (as of 2016).&lt;/li&gt;
+&lt;li&gt;No max length (more on handling that later)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Password should not be on the top 1,000 (or more) most common passwords list
+
+&lt;ul&gt;
+&lt;li&gt;Load a text file during the &lt;code&gt;Init()&lt;/code&gt; of your &lt;a href=&#34;http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package&#34;&gt;app layer&lt;/a&gt; and
+test new passwords against it.&lt;/li&gt;
+&lt;li&gt;Update the password file yearly. A good source I&amp;rsquo;ve found is &lt;a href=&#34;https://github.com/robsheldon/bad-passwords-index&#34;&gt;here&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Thats it.&lt;/p&gt;
+
+&lt;p&gt;Simple requirements are easier for your users to understand, easier for you to manage, and easier for you to rip out and
+rewrite when technology inevitably changes.&lt;/p&gt;
+
+&lt;p&gt;Recommended reading:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://nakedsecurity.sophos.com/2016/08/18/nists-new-password-rules-what-you-need-to-know/&#34;&gt;New NIST Guidelines for Passwords&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.codinghorror.com/your-password-is-too-damn-short/&#34;&gt;Your Password is Too Damn Short&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;implementation&#34;&gt;Implementation&lt;/h3&gt;
+
+&lt;p&gt;There are a lot of discussions around whether you should hash your passwords using bcrypt or scrypt.  If you are debating
+between these two, then you are off to a good start.  &lt;a href=&#34;https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users&#34;&gt;Yahoo&lt;/a&gt;
+was apparently using MD5.  Personally I went with bcrypt, but both scrypt and bcrypt give you good protections against
+modern attacks (with the ability to increase the work factor), while doing away with unneeded aspects of password management
+like salting.&lt;/p&gt;
+
+&lt;p&gt;However, there is one aspect of bcrypt and scrypt that you need to be careful of.  By their very nature, these hashing
+algorithms take time and resources to process.  They do this to make it hard to run large dictionary attacks.  But this
+also leaves your web application vulnerable to a potential denial of service attack if a user submits a very large
+password.  To protect against this, you could set a max possible length for user&amp;rsquo;s passwords, but that goes in the face
+of the rule above: &lt;em&gt;Long passwords are better than complex passwords&lt;/em&gt;.  Instead, we can pass the password through a sha512
+sum, to guarantee that only 512 bits ever get passed through to bcrypt or scrypt.&lt;/p&gt;
+
+&lt;p&gt;Below is the implementation of this (with the optional third party authentication) in &lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package app
+
+...
+
+
+/// UserLogin logs in a user via their password and either their username or email
+func UserLogin(usernameOrEmail, password string) (*User, error) {
+	u := &amp;amp;User{}
+	if strings.Contains(usernameOrEmail, &amp;quot;@&amp;quot;) {
+		//login with email
+		err := data.UserGetEmail(u, usernameOrEmail)
+		if err == data.ErrNotFound {
+			return nil, ErrUserEmailNotFound // can test for email, but not username
+		}
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// login with username
+		err := data.UserGet(u, data.NewKey(usernameOrEmail))
+		if err == data.ErrNotFound {
+			// don&#39;t expose that user doesn&#39;t exist
+			// a bad password and an incorrect username should look the same
+			return nil, ErrUserLogonFailure 
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	if u.HasPassword == false || len(u.Password) == 0 {
+		//User isn&#39;t a password based user, and can&#39;t login with a password
+		// they need to use facebook/google/twitter
+		return nil, ErrUserLogonFailure
+	}
+	err := u.login(password)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (u *User) login(password string) error {
+	if !u.HasPassword || len(u.Password) == 0 {
+		if u.GoogleID == &amp;quot;&amp;quot; &amp;amp;&amp;amp; u.FacebookID == &amp;quot;&amp;quot; &amp;amp;&amp;amp; u.TwitterID == &amp;quot;&amp;quot; {
+			return ErrUserLogonFailure
+		}
+		// Can&#39;t auth password for non-password based users
+		return nil
+	}
+
+	// sha512 password and compare
+	shaPass := sha512.Sum512([]byte(password))
+
+	err := bcrypt.CompareHashAndPassword(u.Password, shaPass)
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return ErrUserLogonFailure
+		}
+		return err
+	}
+	return nil
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Dropbox does something similar with their passwords, and they have a good writeup of their implementation here:
+&lt;a href=&#34;https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/&#34;&gt;https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;password-resets-forgotten-passwords&#34;&gt;Password Resets / Forgotten Passwords&lt;/h3&gt;
+
+&lt;p&gt;Notice above, how there is no mention of security questions, or password hints.  This is on purpose.  Some of the biggest,
+most public &amp;ldquo;hacks&amp;rdquo; that you&amp;rsquo;ll read about online are almost always due to taking over accounts by looking up or guessing
+answers to security questions.  The much safer, and simpler way for users to recover passwords is to use a recovery email
+request.&lt;/p&gt;
+
+&lt;p&gt;Generate a unique random token (make sure to use &lt;a href=&#34;https://golang.org/pkg/crypto/rand/&#34;&gt;crypto/rand&lt;/a&gt; not
+&lt;a href=&#34;https://golang.org/pkg/math/rand/&#34;&gt;math/rand&lt;/a&gt;) and email it to the &lt;em&gt;previously verified&lt;/em&gt; email address of your user.
+In the email have the unique token passed through a URL that triggers a password reset if the token is valid.  Tokens
+should be usable once only, and should eventually expire if not used.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;//Random returns a random, url safe value of the bit length passed in
+func Random(bits int) string {
+	result := make([]byte, bits/8)
+	_, err := io.ReadFull(rand.Reader, result)
+	if err != nil {
+		panic(fmt.Sprintf(&amp;quot;Error generating random values: %v&amp;quot;, err))
+	}
+	return base64.RawURLEncoding.EncodeToString(result)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;session-management&#34;&gt;Session Management&lt;/h2&gt;
+
+&lt;p&gt;Now that you&amp;rsquo;ve authenticated your user, you&amp;rsquo;ll want to create a session so that they don&amp;rsquo;t need to re-login on every
+request.  Just like with forgotten passwords and OAUTH, you&amp;rsquo;ll be creating a unique, cryptographically random, and expire-
+able token to identify a session.  You&amp;rsquo;ll store that token in a cookie in the browser, and force an early expiration
+when the user logs out.&lt;/p&gt;
+
+&lt;p&gt;Here&amp;rsquo;s what the complete Session type looks like in &lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.  You&amp;rsquo;ll notice there is
+a bit more in there besides just the token (SessionID) and expiration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package app
+
+...
+
+
+// Session is an authenticated session into townsourced
+type Session struct {
+	Key       string //userkey+sessionID 
+	UserKey   data.Key
+	SessionID string  
+	CSRFToken string
+	Valid     bool
+	Expires   time.Time
+	When      time.Time
+	IPAddress string
+	UserAgent string
+
+
+	user *User // cached user struct, to prevent repeated DB lookups
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After a user successfully authenticates, you can create a new session and store it in your database.  This session will
+be looked up on every request, so if you run into performance issues, you should consider storing it in a caching layer.
+In townsourced, I used &lt;a href=&#34;https://memcached.org/&#34;&gt;memcached&lt;/a&gt;, but there are many options available, just as long as the
+caching layer is available to &lt;em&gt;all&lt;/em&gt; of your web servers, otherwise if a user gets load-balanced to a different web
+server, it&amp;rsquo;ll look like they&amp;rsquo;ve been logged out.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package app
+
+...
+
+// SessionNew generates a new session for the passed in user
+func SessionNew(user *User, expires time.Time, ipAddress, userAgent string) (*Session, error) {
+	if expires.IsZero() {
+		expires = time.Now().AddDate(0, 0, 3) // default expiration
+	}
+	s := &amp;amp;Session{
+		UserKey:   user.Username,
+		SessionID: Random(128),
+		CSRFToken: Random(256),
+		Valid:     true,
+		Expires:   expires,
+		When:      time.Now(),
+		IPAddress: ipAddress,
+		UserAgent: userAgent,
+	}
+
+	s.Key = string(s.UserKey) + &amp;quot;_&amp;quot; + s.SessionID
+	err := data.SessionInsert(s, s.Key, s.Expires)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once your session is created in the back-end, you can store your new session in a cookie in the user&amp;rsquo;s browser.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package web
+
+...
+
+func setSessionCookie(w http.ResponseWriter, r *http.Request, u *app.User, rememberMe bool) error {
+	expires := time.Time{}
+	if rememberMe {
+		expires = time.Now().AddDate(0, 0, 15)
+	}
+	s, err := app.SessionNew(u, expires, ipAddress(r), r.UserAgent())
+	if err != nil {
+		return err
+	}
+	cookie := &amp;amp;http.Cookie{
+		Name:     cookieName, // const of your app name
+		Value:    s.Key,
+		HttpOnly: true, 
+		Path:     &amp;quot;/&amp;quot;,
+		Secure:   isSSL, // global var set if running ssl
+		Expires:  expires,
+	}
+	http.SetCookie(w, cookie)
+	return nil
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then on each request, you can check if the session is valid:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package web
+
+...
+
+// get a session from the request
+func session(r *http.Request) (*app.Session, error) {
+	// must iter through all cookies because you can have
+	// multiple cookies with the same name
+	// the cookie is valid only if the name matches AND it has a value
+	cookies := r.Cookies()
+	cValue := &amp;quot;&amp;quot;
+	for i := range cookies {
+		if cookies[i].Name == cookieName {
+			if cookies[i].Value != &amp;quot;&amp;quot; {
+				cValue = cookies[i].Value
+			}
+		}
+	}
+	if cValue == &amp;quot;&amp;quot; {
+		return nil, nil
+	}
+	s, err := app.SessionGet(cValue)
+	if err == app.ErrSessionInvalid {
+		return nil, nil
+	}
+	return s, err
+}
+
+...
+
+package app
+
+...
+
+// SessionGet retrieves a session
+func SessionGet(sessionKey string) (*Session, error) {
+	s := &amp;amp;Session{}
+	err := data.SessionGet(s, sessionKey)
+	if err == data.ErrNotFound {
+		return nil, ErrSessionInvalid
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !s.Valid || s.Expires.Before(time.Now()) {
+		return nil, ErrSessionInvalid
+	}
+	return s, nil
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note how you track expiration on both the client &lt;em&gt;and&lt;/em&gt; the server.  Never trust anything from the client.&lt;/p&gt;
+
+&lt;p&gt;If the client wants to log off, you simply expire the session early (or mark it invalid if you want to preserve the
+original expiration date).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Go&#34;&gt;package web
+
+func logout (w http.ResponseWriter, r *http.Request, s *app.Session) {
+	cookie, err := r.Cookie(cookieName)
+	if err != http.ErrNoCookie {
+		if cookie.Value == s.Key {
+			// clear value, and set maxAge: 0
+			cookie := &amp;amp;http.Cookie{
+				Name:     cookieName,
+				Value:    &amp;quot;&amp;quot;,
+				HttpOnly: true,
+				Path:     &amp;quot;/&amp;quot;,
+				Secure:   isSSL,
+				MaxAge:   0,
+			}
+			http.SetCookie(w, cookie)
+		}
+	}
+
+	if errHandled(c.session.Logout(), w, r, c) {
+		return
+	}
+}
+
+...
+
+package app
+
+// Logout logs out of a session
+func (s *Session) Logout() error {
+	s.Valid = false
+	return s.put()
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s it.  You should have the basics of managing user authentication in a Go web app.  If you skimmed this post, your
+biggest takeaway should be to not manage passwords, or at the very least, provide your users with the more secure option
+of using Facebook, Google, or Twitter to authenticate with your app.&lt;/p&gt;
+
+&lt;p&gt;The specifics of this post were requested on &lt;a href=&#34;https://www.reddit.com/r/golang/comments/5h6rvh/anatomy_of_a_go_web_application/&#34;&gt;reddit&lt;/a&gt;,
+so if there are any other topics you&amp;rsquo;d like covered, or if you found this post helpful, feel free to leave me a comment,
+or shoot me a message.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Anatomy of a Go Web Application</title>
@@ -500,7 +952,9 @@ I&amp;rsquo;ve only just scratched the surface of the topic.  Hopefully this pos
 as a base to refer to in future posts about more specific aspects of web application development in Go.&lt;/p&gt;
 
 &lt;p&gt;I hope you find this post useful, and if you have any corrections, questions, or suggestions for future posts, let me
-know in the comments below.&lt;/p&gt;</description>
+know in the comments below.&lt;/p&gt;
+
+&lt;p&gt;* edit &lt;a href=&#34;http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication&#34;&gt;Part 2: Authentication&lt;/a&gt; has since been written.&lt;/p&gt;</description>
     </item>
     
   </channel>
