@@ -109,19 +109,19 @@ func FacebookUser(redirectURI, code string) (*User, error) {
 } 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Your Google and Twitter functions will look very similar.  Check if a user already exists, associated to the given
-third party credentials, and if so, log them in, otherwise use the information shared (or accessible via some other API)
-to build a new user.&lt;/p&gt;
+&lt;p&gt;Your Google and Twitter functions will look very similar.  Check if a user already exists for the given third party
+credentials. If so, log them in, otherwise use the information shared (or accessible via some other API) to build a new
+user.&lt;/p&gt;
 
 &lt;h2 id=&#34;passwords&#34;&gt;Passwords&lt;/h2&gt;
 
 &lt;p&gt;If for some reason your user does not want to use a third party login, or you aren&amp;rsquo;t permitted to offer them in your app
-(for instance internal, non-internet facing apps), you&amp;rsquo;ll need to securely manage your user&amp;rsquo;s passwords.&lt;/p&gt;
+(for instance internal, non-internet facing apps), you&amp;rsquo;ll need to securely manage your users&amp;rsquo; passwords.&lt;/p&gt;
 
 &lt;h3 id=&#34;requirements&#34;&gt;Requirements&lt;/h3&gt;
 
-&lt;p&gt;There is a lot of discussion, and argument over password best practices, and I highly recommend doing your own research,
-and getting a good understanding of the implications of some of these decisions before starting.  Once again, the best
+&lt;p&gt;There is a lot of discussion, and argument over password best practices.  I highly recommend doing your own research,
+to get a better understanding of the implications of some of these decisions before you start.  Once again, the best
 option is to &lt;em&gt;not to manage passwords at all&lt;/em&gt;. That being said, here is a short list of best practices I try to meet when
 setting my password requirements.&lt;/p&gt;
 
@@ -129,9 +129,13 @@ setting my password requirements.&lt;/p&gt;
 &lt;li&gt;Longer passwords are better than complex passwords
 
 &lt;ul&gt;
-&lt;li&gt;Skip doing any complexity checks, or requiring a minimum level of entropy, or at least one number, special
-symbols, etc&lt;/li&gt;
-&lt;li&gt;Minimum password length should be 10, or even better 12 (as of 2016).&lt;/li&gt;
+&lt;li&gt;Skip doing any complexity checks
+
+&lt;ul&gt;
+&lt;li&gt;Don&amp;rsquo;t require a minimum level of entropy&lt;/li&gt;
+&lt;li&gt;Don&amp;rsquo;t require at least one number or special symbols, etc&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Minimum password length should be 10, or even better 12 (&lt;a href=&#34;https://blog.codinghorror.com/your-password-is-too-damn-short/&#34;&gt;as of 2015&lt;/a&gt;)&lt;/li&gt;
 &lt;li&gt;No max length (more on handling that later)&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;Password should not be on the top 1,000 (or more) most common passwords list
@@ -157,8 +161,8 @@ rewrite when technology inevitably changes.&lt;/p&gt;
 
 &lt;h3 id=&#34;implementation&#34;&gt;Implementation&lt;/h3&gt;
 
-&lt;p&gt;There are a lot of discussions around whether you should hash your passwords using bcrypt or scrypt.  If you are debating
-between these two, then you are off to a good start.  &lt;a href=&#34;https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users&#34;&gt;Yahoo&lt;/a&gt;
+&lt;p&gt;Once again, there is a lot of discussion around whether you should hash your passwords using bcrypt or scrypt.  If you
+are debating between these two, then you are off to a good start.  &lt;a href=&#34;https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users&#34;&gt;Yahoo&lt;/a&gt;
 was apparently using MD5.  Personally I went with bcrypt, but both scrypt and bcrypt give you good protections against
 modern attacks (with the ability to increase the work factor), while doing away with unneeded aspects of password management
 like salting.&lt;/p&gt;
