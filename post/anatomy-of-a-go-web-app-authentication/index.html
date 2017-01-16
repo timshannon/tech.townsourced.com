@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+  
+  
+ <html lang="en">   
+<head>
+
+    <title>Anatomy of a Go Web App - Part 2: Authentication</title>
+
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
+
+<meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,web development, go, golang, backend development, passwords, oauth, security, best practice, ">
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content=""/>
+<meta property="og:title" content="Anatomy of a Go Web App - Part 2: Authentication : tech.townsourced.com"/>
+<meta property="og:site_name" content="Townsourced Tech Blog"/>
+
+<meta property="og:url" content="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2017-01-15"/>
+<meta property="article:modified_time" content="2017-01-15"/>
+
+
+
+<meta property="article:tag" content="web development">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="backend development">
+<meta property="article:tag" content="passwords">
+<meta property="article:tag" content="oauth">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="best practice">
+
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@townsourced">
+<meta name="twitter:title" content="Anatomy of a Go Web App - Part 2: Authentication : tech.townsourced.com">
+<meta name="twitter:creator" content="@shannontimothy">
+<meta name="twitter:description" content="">
+
+<meta name="twitter:domain" content="townsourced.com">
+
+
+
+    <link rel="canonical" href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">
+		<link href="" rel="alternate" type="application/rss+xml" title="Townsourced Tech Blog" />
+
+    <link rel="shortcut icon" href="http://tech.townsourced.com/favicon.ico">  
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/main.css">
+
+    
+    
+    
+</head> 
+
+
+<body>
+   
+	  
+<header class="header">
+		<div class="container">                       
+				<div class="profile-content pull-left">
+						<h1 class="name">Townsourced Tech Blog</h1>
+						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
+						<ul class="social list-inline">
+								<li><a id="homeLink" href="http://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
+								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
+								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
+								<li class="last-item"><a href="http://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+						</ul> 
+				</div>
+		</div>
+</header>
+    
+
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-md-8 col-sm-12 col-xs-12">
+								<section class="section post">
+                    <div class="section-inner">
+                        <h2 class="heading title">Anatomy of a Go Web App - Part 2: Authentication
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> Sunday, Jan 15, 2017</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 11 min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
+                        <div class="content">
+													<p>This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for
+<a href="https://www.townsourced.com">townsourced</a>.  The first part is <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/">here</a>.</p>
+
+<p>Instead of a general overview, like part one, this post will focus specifically on <strong>User Authentication</strong>, i.e. how to
+handle passwords (if at all) and session management.</p>
+
+<p></p>
+
+<h1 id="password-management">Password Management</h1>
+
+<p>The best, and most secure system for managing passwords in a web app is <em>not to manage passwords at all</em>.  The most secure
+and bulletproof password system is still vulnerable to your user&rsquo;s fallibility, and as you&rsquo;ll see when we go over password
+management below, most of the work goes into trying to protect the users from themselves.</p>
+
+<p>So, how do you get out of the password management business?  You offload the work to trusted third parties.  This usually
+means integrating <a href="https://en.wikipedia.org/wiki/OAuth">OAUTH</a> into your authentication code.</p>
+
+<h2 id="oauth">OAUTH</h2>
+
+<p>You&rsquo;ll want to use popular third parties through which your users will probably already have accounts set up. My policy is
+to give users as many options as possible so that the simplest option for them is to <em>not</em> create a password in my app.<br />
+This means adding OAUTH support for one or more of the <strong>Big Three</strong>.</p>
+
+<ul>
+<li><strong>Facebook</strong>: <a href="https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow">Manually Build a Login Flow</a></li>
+<li><strong>Google</strong>: <a href="https://developers.google.com/identity/sign-in/web/server-side-flow">Google Sign-In for server-side apps</a></li>
+<li><strong>Twitter</strong>: <a href="https://dev.twitter.com/web/sign-in/implementing">Implementing Sign in with Twitter</a></li>
+</ul>
+
+<p>This will not be a detailed overview of implementing OAUTH, there are
+<a href="https://aaronparecki.com/2012/07/29/2/oauth2-simplified">better articles</a> out there for that.  I will, however, step
+you through the pieces you need to have in place in order to get it working.  A very high level overview of OAUTH looks
+like this (courtesy of Google):</p>
+
+<p><img src="http://tech.townsourced.com/images/post/anatomy-of-a-go-web-app-authentication/server_side_code_flow.png" alt="OAUTH2 Server Side Flow" title="Server Side Code Flow" /></p>
+
+<p>Facebook and Google are very similar, and you should be able to get by with a standard
+<a href="https://github.com/golang/oauth2">OAUTH2 library</a> (with a little bit of tweaking).  Twitter, on the other hand, actually
+uses <em>OAUTH1.0A</em>, so you&rsquo;ll need to make sure you use a library built for it like
+<a href="https://github.com/mrjones/oauth">https://github.com/mrjones/oauth</a>.</p>
+
+<p>Each of the <strong>Big Three</strong> have a unique user identifier that you can store with your <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package">user record</a>.</p>
+
+<pre><code class="language-Go">package app
+
+...
+
+
+type User struct {
+	Username       data.Key        
+	Email          string          
+	...
+	GoogleID       string         
+	FacebookID     string        
+	TwitterID      string       
+	...
+}
+</code></pre>
+
+<p>And once that&rsquo;s in place, you can do something like this:</p>
+
+<pre><code class="language-Go">package app
+
+...
+
+
+// FacebookUser gets a user (if possible) from the passed in facebook code
+func FacebookUser(redirectURI, code string) (*User, error) {
+	fbSes, err := facebookGetSession(redirectURI, code)
+	if err != nil {
+		return nil, err
+	}
+	//Lookup user in the database
+	usr, err := userGetFacebook(fbSes.userID)
+	if err == ErrUserNotFound {
+		data, err := fbSes.userData()
+		if err != nil {
+			return nil, err
+		}
+
+		// Create new user from Facebook data
+		...
+		return newUser, ErrUserNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	// Return user and log them in
+	return usr, nil
+} 
+</code></pre>
+
+<p>Your Google and Twitter functions will look very similar.  Check if a user already exists, associated to the given
+third party credentials, and if so, log them in, otherwise use the information shared (or accessible via some other API)
+to build a new user.</p>
+
+<h2 id="passwords">Passwords</h2>
+
+<p>If for some reason your user does not want to use a third party login, or you aren&rsquo;t permitted to offer them in your app
+(for instance internal, non-internet facing apps), you&rsquo;ll need to securely manage your user&rsquo;s passwords.</p>
+
+<h3 id="requirements">Requirements</h3>
+
+<p>There is a lot of discussion, and argument over password best practices, and I highly recommend doing your own research,
+and getting a good understanding of the implications of some of these decisions before starting.  Once again, the best
+option is to <em>not to manage passwords at all</em>. That being said, here is a short list of best practices I try to meet when
+setting my password requirements.</p>
+
+<ol>
+<li>Longer passwords are better than complex passwords
+
+<ul>
+<li>Skip doing any complexity checks, or requiring a minimum level of entropy, or at least one number, special
+symbols, etc</li>
+<li>Minimum password length should be 10, or even better 12 (as of 2016).</li>
+<li>No max length (more on handling that later)</li>
+</ul></li>
+<li>Password should not be on the top 1,000 (or more) most common passwords list
+
+<ul>
+<li>Load a text file during the <code>Init()</code> of your <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package">app layer</a> and
+test new passwords against it.</li>
+<li>Update the password file yearly. A good source I&rsquo;ve found is <a href="https://github.com/robsheldon/bad-passwords-index">here</a>.</li>
+</ul></li>
+</ol>
+
+<p>Thats it.</p>
+
+<p>Simple requirements are easier for your users to understand, easier for you to manage, and easier for you to rip out and
+rewrite when technology inevitably changes.</p>
+
+<p>Recommended reading:</p>
+
+<ul>
+<li><a href="https://nakedsecurity.sophos.com/2016/08/18/nists-new-password-rules-what-you-need-to-know/">New NIST Guidelines for Passwords</a></li>
+<li><a href="https://blog.codinghorror.com/your-password-is-too-damn-short/">Your Password is Too Damn Short</a></li>
+</ul>
+
+<h3 id="implementation">Implementation</h3>
+
+<p>There are a lot of discussions around whether you should hash your passwords using bcrypt or scrypt.  If you are debating
+between these two, then you are off to a good start.  <a href="https://yahoo.tumblr.com/post/154479236569/important-security-information-for-yahoo-users">Yahoo</a>
+was apparently using MD5.  Personally I went with bcrypt, but both scrypt and bcrypt give you good protections against
+modern attacks (with the ability to increase the work factor), while doing away with unneeded aspects of password management
+like salting.</p>
+
+<p>However, there is one aspect of bcrypt and scrypt that you need to be careful of.  By their very nature, these hashing
+algorithms take time and resources to process.  They do this to make it hard to run large dictionary attacks.  But this
+also leaves your web application vulnerable to a potential denial of service attack if a user submits a very large
+password.  To protect against this, you could set a max possible length for user&rsquo;s passwords, but that goes in the face
+of the rule above: <em>Long passwords are better than complex passwords</em>.  Instead, we can pass the password through a sha512
+sum, to guarantee that only 512 bits ever get passed through to bcrypt or scrypt.</p>
+
+<p>Below is the implementation of this (with the optional third party authentication) in <a href="https://www.townsourced.com">townsourced</a>.</p>
+
+<pre><code class="language-Go">package app
+
+...
+
+
+/// UserLogin logs in a user via their password and either their username or email
+func UserLogin(usernameOrEmail, password string) (*User, error) {
+	u := &amp;User{}
+	if strings.Contains(usernameOrEmail, &quot;@&quot;) {
+		//login with email
+		err := data.UserGetEmail(u, usernameOrEmail)
+		if err == data.ErrNotFound {
+			return nil, ErrUserEmailNotFound // can test for email, but not username
+		}
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// login with username
+		err := data.UserGet(u, data.NewKey(usernameOrEmail))
+		if err == data.ErrNotFound {
+			// don't expose that user doesn't exist
+			// a bad password and an incorrect username should look the same
+			return nil, ErrUserLogonFailure 
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	if u.HasPassword == false || len(u.Password) == 0 {
+		//User isn't a password based user, and can't login with a password
+		// they need to use facebook/google/twitter
+		return nil, ErrUserLogonFailure
+	}
+	err := u.login(password)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (u *User) login(password string) error {
+	if !u.HasPassword || len(u.Password) == 0 {
+		if u.GoogleID == &quot;&quot; &amp;&amp; u.FacebookID == &quot;&quot; &amp;&amp; u.TwitterID == &quot;&quot; {
+			return ErrUserLogonFailure
+		}
+		// Can't auth password for non-password based users
+		return nil
+	}
+
+	// sha512 password and compare
+	shaPass := sha512.Sum512([]byte(password))
+
+	err := bcrypt.CompareHashAndPassword(u.Password, shaPass)
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return ErrUserLogonFailure
+		}
+		return err
+	}
+	return nil
+}
+</code></pre>
+
+<p>Dropbox does something similar with their passwords, and they have a good writeup of their implementation here:
+<a href="https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/">https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/</a>.</p>
+
+<h3 id="password-resets-forgotten-passwords">Password Resets / Forgotten Passwords</h3>
+
+<p>Notice above, how there is no mention of security questions, or password hints.  This is on purpose.  Some of the biggest,
+most public &ldquo;hacks&rdquo; that you&rsquo;ll read about online are almost always due to taking over accounts by looking up or guessing
+answers to security questions.  The much safer, and simpler way for users to recover passwords is to use a recovery email
+request.</p>
+
+<p>Generate a unique random token (make sure to use <a href="https://golang.org/pkg/crypto/rand/">crypto/rand</a> not
+<a href="https://golang.org/pkg/math/rand/">math/rand</a>) and email it to the <em>previously verified</em> email address of your user.
+In the email have the unique token passed through a URL that triggers a password reset if the token is valid.  Tokens
+should be usable once only, and should eventually expire if not used.</p>
+
+<pre><code class="language-Go">//Random returns a random, url safe value of the bit length passed in
+func Random(bits int) string {
+	result := make([]byte, bits/8)
+	_, err := io.ReadFull(rand.Reader, result)
+	if err != nil {
+		panic(fmt.Sprintf(&quot;Error generating random values: %v&quot;, err))
+	}
+	return base64.RawURLEncoding.EncodeToString(result)
+}
+</code></pre>
+
+<h2 id="session-management">Session Management</h2>
+
+<p>Now that you&rsquo;ve authenticated your user, you&rsquo;ll want to create a session so that they don&rsquo;t need to re-login on every
+request.  Just like with forgotten passwords and OAUTH, you&rsquo;ll be creating a unique, cryptographically random, and expire-
+able token to identify a session.  You&rsquo;ll store that token in a cookie in the browser, and force an early expiration
+when the user logs out.</p>
+
+<p>Here&rsquo;s what the complete Session type looks like in <a href="https://www.townsourced.com">townsourced</a>.  You&rsquo;ll notice there is
+a bit more in there besides just the token (SessionID) and expiration.</p>
+
+<pre><code class="language-Go">package app
+
+...
+
+
+// Session is an authenticated session into townsourced
+type Session struct {
+	Key       string //userkey+sessionID 
+	UserKey   data.Key
+	SessionID string  
+	CSRFToken string
+	Valid     bool
+	Expires   time.Time
+	When      time.Time
+	IPAddress string
+	UserAgent string
+
+
+	user *User // cached user struct, to prevent repeated DB lookups
+}
+</code></pre>
+
+<p>After a user successfully authenticates, you can create a new session and store it in your database.  This session will
+be looked up on every request, so if you run into performance issues, you should consider storing it in a caching layer.
+In townsourced, I used <a href="https://memcached.org/">memcached</a>, but there are many options available, just as long as the
+caching layer is available to <em>all</em> of your web servers, otherwise if a user gets load-balanced to a different web
+server, it&rsquo;ll look like they&rsquo;ve been logged out.</p>
+
+<pre><code class="language-Go">package app
+
+...
+
+// SessionNew generates a new session for the passed in user
+func SessionNew(user *User, expires time.Time, ipAddress, userAgent string) (*Session, error) {
+	if expires.IsZero() {
+		expires = time.Now().AddDate(0, 0, 3) // default expiration
+	}
+	s := &amp;Session{
+		UserKey:   user.Username,
+		SessionID: Random(128),
+		CSRFToken: Random(256),
+		Valid:     true,
+		Expires:   expires,
+		When:      time.Now(),
+		IPAddress: ipAddress,
+		UserAgent: userAgent,
+	}
+
+	s.Key = string(s.UserKey) + &quot;_&quot; + s.SessionID
+	err := data.SessionInsert(s, s.Key, s.Expires)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+</code></pre>
+
+<p>Once your session is created in the back-end, you can store your new session in a cookie in the user&rsquo;s browser.</p>
+
+<pre><code class="language-Go">package web
+
+...
+
+func setSessionCookie(w http.ResponseWriter, r *http.Request, u *app.User, rememberMe bool) error {
+	expires := time.Time{}
+	if rememberMe {
+		expires = time.Now().AddDate(0, 0, 15)
+	}
+	s, err := app.SessionNew(u, expires, ipAddress(r), r.UserAgent())
+	if err != nil {
+		return err
+	}
+	cookie := &amp;http.Cookie{
+		Name:     cookieName, // const of your app name
+		Value:    s.Key,
+		HttpOnly: true, 
+		Path:     &quot;/&quot;,
+		Secure:   isSSL, // global var set if running ssl
+		Expires:  expires,
+	}
+	http.SetCookie(w, cookie)
+	return nil
+}
+
+
+</code></pre>
+
+<p>And then on each request, you can check if the session is valid:</p>
+
+<pre><code class="language-Go">package web
+
+...
+
+// get a session from the request
+func session(r *http.Request) (*app.Session, error) {
+	// must iter through all cookies because you can have
+	// multiple cookies with the same name
+	// the cookie is valid only if the name matches AND it has a value
+	cookies := r.Cookies()
+	cValue := &quot;&quot;
+	for i := range cookies {
+		if cookies[i].Name == cookieName {
+			if cookies[i].Value != &quot;&quot; {
+				cValue = cookies[i].Value
+			}
+		}
+	}
+	if cValue == &quot;&quot; {
+		return nil, nil
+	}
+	s, err := app.SessionGet(cValue)
+	if err == app.ErrSessionInvalid {
+		return nil, nil
+	}
+	return s, err
+}
+
+...
+
+package app
+
+...
+
+// SessionGet retrieves a session
+func SessionGet(sessionKey string) (*Session, error) {
+	s := &amp;Session{}
+	err := data.SessionGet(s, sessionKey)
+	if err == data.ErrNotFound {
+		return nil, ErrSessionInvalid
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !s.Valid || s.Expires.Before(time.Now()) {
+		return nil, ErrSessionInvalid
+	}
+	return s, nil
+}
+</code></pre>
+
+<p>Note how you track expiration on both the client <em>and</em> the server.  Never trust anything from the client.</p>
+
+<p>If the client wants to log off, you simply expire the session early (or mark it invalid if you want to preserve the
+original expiration date).</p>
+
+<pre><code class="language-Go">package web
+
+func logout (w http.ResponseWriter, r *http.Request, s *app.Session) {
+	cookie, err := r.Cookie(cookieName)
+	if err != http.ErrNoCookie {
+		if cookie.Value == s.Key {
+			// clear value, and set maxAge: 0
+			cookie := &amp;http.Cookie{
+				Name:     cookieName,
+				Value:    &quot;&quot;,
+				HttpOnly: true,
+				Path:     &quot;/&quot;,
+				Secure:   isSSL,
+				MaxAge:   0,
+			}
+			http.SetCookie(w, cookie)
+		}
+	}
+
+	if errHandled(c.session.Logout(), w, r, c) {
+		return
+	}
+}
+
+...
+
+package app
+
+// Logout logs out of a session
+func (s *Session) Logout() error {
+	s.Valid = false
+	return s.put()
+}
+
+</code></pre>
+
+<p>That&rsquo;s it.  You should have the basics of managing user authentication in a Go web app.  If you skimmed this post, your
+biggest takeaway should be to not manage passwords, or at the very least, provide your users with the more secure option
+of using Facebook, Google, or Twitter to authenticate with your app.</p>
+
+<p>The specifics of this post were requested on <a href="https://www.reddit.com/r/golang/comments/5h6rvh/anatomy_of_a_go_web_application/">reddit</a>,
+so if there are any other topics you&rsquo;d like covered, or if you found this post helpful, feel free to leave me a comment,
+or shoot me a message.</p>
+												</div>
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															
+																<span>
+																	<a href="http://tech.townsourced.com/tags/development">
+																		<a href="http://tech.townsourced.com/categories/development">Development</a>
+																	</a>
+																</span>
+															
+													</span>
+
+													<ul class="list-inline tags text-right">
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/go">
+																	<span class="label label-theme">#Go</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/web-development">
+																	<span class="label label-theme">#Web Development</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/tutorial">
+																	<span class="label label-theme">#tutorial</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/reference">
+																	<span class="label label-theme">#reference</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/authentication">
+																	<span class="label label-theme">#authentication</span>
+																</a>
+															</li>
+														
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'techtownsourcedcom';
+    var disqus_identifier = 'http:\/\/tech.townsourced.com\/post\/anatomy-of-a-go-web-app-authentication\/';
+    var disqus_title = 'Anatomy of a Go Web App - Part 2: Authentication';
+    var disqus_url = 'http:\/\/tech.townsourced.com\/post\/anatomy-of-a-go-web-app-authentication\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+												</div>
+                    </div>                 
+									</section>
+                
+            </div>
+						<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div>  
+				</div>                 
+		</aside>
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						
+							<li>
+								<a href="http://tech.townsourced.com/categories/development">development</a>
+							</li>
+						
+					</ul>
+					<hr>
+					<ul class="list-inline tags">
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/authentication">
+									<span class="label label-theme">#authentication</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/go">
+									<span class="label label-theme">#go</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/reference">
+									<span class="label label-theme">#reference</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/tutorial">
+									<span class="label label-theme">#tutorial</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/web-development">
+									<span class="label label-theme">#web-development</span>
+								</a>
+							</li>
+						
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="https://www.townsourced.com" target="_blank"><i class="fa fa-external-link"></i>Townsourced</a></h3>
+										<p class="description">
+											A locally moderated community bulletin board, built to help communities discover events, share, shop and sell locally.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on BoltDB.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div>  
+				</div>                 
+		</aside>
+</div>
+
+					</div>
+    </div>
+	 
+<footer class="footer">
+		<div class="container text-center">
+						<small class="copyright">
+							<div>© <a href="https://solutions.townsourced.com" target="_blank">Townsourced</a>  - design modified from template by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a></div>
+							<div>
+						Unless otherwise noted, content is released under a  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</div>
+						</small>
+		</div>
+</footer>
+
+<script type="text/javascript" src="http://tech.townsourced.com/js/prism.js"></script>            
+
+
+<script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
+
+
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    _paq.push(['setTrackerUrl',  'https://api-e68fcf7f9c66665c7e009b9f533bdf6f.townsourced.com']);
+    _paq.push(['setSiteId', 2]);
+    _paq.push(['setApiToken', 'E80SMnaO8kFL-gyxQRvLEUTUOCv6zi3R63VALxf64ft']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://5plhgbtl6we7tvxqeqt1.townsourced.com/embed.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+
+
+
+    
+
+	<script type="text/javascript">
+		
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
+</body>
+</html> 
