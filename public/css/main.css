@@ -490,3 +490,8 @@ iframe {
     background-color: #2d844e;
     border-color: #2d844e;
 }
+
+pre {
+	background-color: #272822;
+	color: #f8f8f2;
+}
