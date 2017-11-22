@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+  
+  
+ <html lang="en">   
+<head>
+
+    <title>Townsourced Open-sourced</title>
+
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
+
+<meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,web development, go, golang, backend development, open-source, ">
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content=""/>
+<meta property="og:title" content="Townsourced Open-sourced : tech.townsourced.com"/>
+<meta property="og:site_name" content="Townsourced Tech Blog"/>
+
+<meta property="og:url" content="http://tech.townsourced.com/post/townsourced-open-sourced/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2017-11-22"/>
+<meta property="article:modified_time" content="2017-11-22"/>
+
+
+
+<meta property="article:tag" content="web development">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="backend development">
+<meta property="article:tag" content="open-source">
+
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@townsourced">
+<meta name="twitter:title" content="Townsourced Open-sourced : tech.townsourced.com">
+<meta name="twitter:creator" content="@shannontimothy">
+<meta name="twitter:description" content="">
+
+<meta name="twitter:domain" content="townsourced.com">
+
+
+
+    <link rel="canonical" href="http://tech.townsourced.com/post/townsourced-open-sourced/">
+    
+    <link rel="shortcut icon" href="http://tech.townsourced.com/favicon.ico">  
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/main.css">
+
+    
+    
+    
+</head> 
+
+
+<body>
+   
+	  
+<header class="header">
+		<div class="container">                       
+				<div class="profile-content pull-left">
+						<h1 class="name">Townsourced Tech Blog</h1>
+						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
+						<ul class="social list-inline">
+								<li><a id="homeLink" href="http://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
+								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
+								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
+								<li class="last-item"><a href="http://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+						</ul> 
+				</div>
+		</div>
+</header>
+    
+
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-md-8 col-sm-12 col-xs-12">
+								<section class="section post">
+                    <div class="section-inner">
+                        <h2 class="heading title">Townsourced Open-sourced
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> Wednesday, Nov 22, 2017</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 6 min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="http://tech.townsourced.com/post/townsourced-open-sourced/#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
+                        <div class="content">
+													
+
+<p>My goal with Townsourced was first and foremost to build something useful for local, small communities.  I felt local
+communities were very under-represented online, and the social networks available catered either to large communities or niche
+communities of shared interest.  My target audience was small, local communities: small towns, college campuses,
+neighborhoods, churches, schools.  I wanted to build something that handled the overlap between those local communities
+better than existing options.</p>
+
+<!-- more -->
+
+<p>It started as a small side project, and grew from there.  I showed it to a few angel investors, and demoed it to the
+Minneapolis Tech community at <a href="https://minnestar.org/minnedemo/">Minnedemo</a>, but it never went any further than that.</p>
+
+<p>I&rsquo;ve finally gotten around to open sourcing it, and I believe there are a few interesting things in the source code that
+I hope will, at a minimum, be useful as an example.</p>
+
+<p>You can access a live version of this code running at <a href="https://www.townsourced.com">https://www.townsourced.com</a> which
+I plan to keep running.</p>
+
+<p>If you have any questions, or would like some help setting Townsourced up to run for your own community, feel free to
+send me a message at <a href="mailto:tim@townsourced.com">tim@townsourced.com</a>.</p>
+
+<h1 id="running-townsourced">Running Townsourced</h1>
+
+<p>The quickest way to run Townsourced is with Docker.  Install <a href="https://www.docker.com/">Docker</a> and
+<a href="https://docs.docker.com/compose/install/">Docker-Compose</a>, then run <code>docker-compose up</code>.</p>
+
+<p>This will start a containerized instance of townsourced listening on port <code>8080</code>, running with RethinkDB, Elasticsearch
+and Memcached.</p>
+
+<p>The Docker Compose file can be found <a href="https://github.com/timshannon/townsourced/blob/master/docker-compose.yaml">here</a>.</p>
+
+<h1 id="building">Building</h1>
+
+<p>Townsourced is written in go, and all of it&rsquo;s dependencies are vendored.  You can build townsourced by simply running
+<code>go get github.com/timshannon/townsourced</code>.</p>
+
+<p>To build the web / client portion you&rsquo;ll need to install <a href="https://github.com/gobblejs/gobble">gobble</a></p>
+
+<p><code>npm install -g gobble-cli</code></p>
+
+<p>Then run <code>gobble build static -f</code> in the <code>web</code> folder.</p>
+
+<h1 id="deploying">Deploying</h1>
+
+<p>The easiest way to deploy townsourced is to use the Docker.  The <code>docker-compose.yaml</code> file can be used to run the
+entire stack, or give you an insight into what services are needed.  Simply run <code>docker-compose up</code> and you&rsquo;ll have
+a running instance of townsourced at <a href="http://localhost:8080">http://localhost:8080</a>.</p>
+
+<p>To deploy Townsourced manually, you&rsquo;ll need:</p>
+
+<ul>
+<li><a href="https://rethinkdb.com/">RethinkDB</a></li>
+<li><a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> (2.4.6)</li>
+<li><a href="https://memcached.org/">Memcached</a></li>
+</ul>
+
+<p>Townsourced will look for a <code>settings.json</code> file either in it&rsquo;s running directory, or in <code>/etc/townsourced/</code> on linux. In
+that <code>settings.json</code> file will be the connection parameters that Townsourced will use to connect to the various services.
+Here is an example of what that looks like:</p>
+
+<pre><code class="language-json">{
+    &quot;app&quot;: {
+        &quot;httpClientTimeout&quot;: &quot;30s&quot;,
+        &quot;taskPollTime&quot;: &quot;1m&quot;,
+        &quot;taskQueueSize&quot;: 100
+    },
+    &quot;data&quot;: {
+        &quot;cache&quot;: {
+            &quot;addresses&quot;: [
+                &quot;127.0.0.1:11211&quot;
+            ]
+        },
+        &quot;db&quot;: {
+            &quot;address&quot;: &quot;127.0.0.1:28015&quot;,
+            &quot;database&quot;: &quot;townsourced&quot;,
+            &quot;timeout&quot;: &quot;60s&quot;
+        },
+        &quot;search&quot;: {
+            &quot;addresses&quot;: [
+                &quot;http://127.0.0.1:9200&quot;
+            ],
+            &quot;index&quot;: {
+                &quot;name&quot;: &quot;townsourced&quot;,
+                &quot;replicas&quot;: 1,
+                &quot;shards&quot;: 5
+            },
+            &quot;maxRetries&quot;: 0
+        }
+    },
+    &quot;web&quot;: {
+        &quot;address&quot;: &quot;https://www.townsourced.com&quot;,
+        &quot;certFile&quot;: &quot;&quot;,
+        &quot;keyFile&quot;: &quot;&quot;,
+        &quot;maxHeaderBytes&quot;: 0,
+        &quot;maxUploadMemoryMB&quot;: 10,
+        &quot;minTLSVersion&quot;: 769,
+        &quot;readTimeout&quot;: &quot;60s&quot;,
+        &quot;writeTimeout&quot;: &quot;60s&quot;
+    }
+}
+</code></pre>
+
+<p>Finally, you&rsquo;ll need a <code>web/static</code> folder (built from gobble) in the running directory of townsourced.</p>
+
+<h1 id="items-of-interest">Items of Interest</h1>
+
+<p>I&rsquo;ve dived into more detail in the <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/">Anatomy of a Go Web Application</a> and
+<a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">Authentication</a> posts, but I wanted to quick run through a few points
+of interest (in my opinion) in the Townsourced code.</p>
+
+<h2 id="posts-that-exist-in-more-than-one-town">Posts that exist in more than one town</h2>
+
+<p>One of my big goals with Townsourced was to better describe the overlapping communities that a person belongs to. Most
+social networks simply have Groups that you join.  Townsourced <em>Towns</em> are similar except that when you create a post,
+you can post it to multiple communities <em>simultaneously</em>.  The discussions around that post live with the post and exist
+across communities, but communities could still moderate a post in one Town without it impacting another town.</p>
+
+<p><img src="http://tech.townsourced.com/images/post/townsourced-opensourced/multi-town.png" alt="Multi-town Posts" title="Multi-town Posts" /></p>
+
+<p>You can see the Post structure, and how it tracks Towns and moderation
+<a href="https://github.com/timshannon/townsourced/blob/master/app/post.go#L99">here</a>.</p>
+
+<h2 id="private-package-for-open-source-release">Private package for open source release</h2>
+
+<p>I knew I wanted to eventually open-source Townsourced regardless of whatever came of it, so I made sure that I kept
+anything that I didn&rsquo;t want to be released to the public (API keys, passwords, etc) in a separate package so that it
+could be easily removed.</p>
+
+<p>All of the API keys that Townsourced uses are stored here, from Facebook to the the client side Google Maps API key,
+which is <a href="https://github.com/timshannon/townsourced/blob/master/web/src/townSearch.template.html#L168">inserted into the html template</a>.</p>
+
+<p>You can see that package <a href="https://github.com/timshannon/townsourced/blob/master/data/private/private.go">here</a>.</p>
+
+<p>If you want to run Townsourced for yourself you can get each one of the API keys used for free without committing to any
+subscription or fees.  The <a href="https://developers.google.com/maps/documentation/embed/get-api-key">Google Maps API key</a>
+would be a minimum to have for a lot of the UI functionality to work.</p>
+
+<h2 id="attribution">Attribution</h2>
+
+<p>Open-source is important, and Townsourced relies heavily on open-source technologies.  Most open-source licenses are
+incredibly permissive, but they also have a clause denoting the need for attribution to the original author.</p>
+
+<p>Most people simply include the license or creator comments with their releases, which meets the requirements of the license.
+What I try to do in any software I write is find a place to clearly list those attributions so they are easy to find. It
+also makes it easy to see the technologies used to build the piece of software.
+In Townsourced, a link to <a href="https://www.townsourced.com/attribution/">that attribution</a> can be found in the footer of every page.</p>
+
+<h2 id="versioning">Versioning</h2>
+
+<p>In most web applications you need to be able to handle the scenario where two users are updating the same data.  One
+will finish their changes and save, and the second user will then be editing the <em>previous</em> version of that data.  If you
+allow the second user to commit their changes, the first user&rsquo;s data will be overwritten.  Sometimes this isn&rsquo;t a big deal,
+but I chose to not allow it in Townsourced.</p>
+
+<p>I handled this by generating a small random value with any object I wanted to version, and when a database update happens
+it checks if the current version matches the passed in version with the update.  If the version doesn&rsquo;t match, the user gets
+a message saying their screen is out of date and they need to refresh the page.</p>
+
+<p>Go makes it easy to embed this <a href="https://github.com/timshannon/townsourced/blob/master/data/version.go#L42">version struct</a>
+that handles the update logic into <a href="https://github.com/timshannon/townsourced/blob/master/app/town.go#L22">existing structs</a>.</p>
+
+<p>You can see how that works <a href="https://github.com/timshannon/townsourced/blob/master/data/version.go">here</a>.</p>
+
+<h2 id="less-in-ractive-components">Less in Ractive Components</h2>
+
+<p>When I first started Townsourced, <a href="https://vuejs.org/">Vue</a> was just getting rolling, and I hadn&rsquo;t even heard of it yet.
+I had built a few projects with <a href="https://ractive.js.org/">Ractive</a> and found it to be simple and powerful.  I especially
+loved Ractive Components; bundles of application UI logic combined with encapsulated HTML and CSS.  It made it really easy
+to build a UI in pieces and reuse them as needed.</p>
+
+<p>However, I quickly ran into issues where I was having to duplicate many of the variables that were defined in my <code>.less</code> files
+into my components.  Luckily my build tool of choice (<a href="https://github.com/gobblejs/gobble">Gobble</a>) made it easy to write
+a small section into my build scripts to let me compile less into my Ractive components.  This is, of course, something
+that the Vue ecosystem now handles automatically for you.  It&rsquo;s also a reason why I will also favor a programmable build
+tool over a configuration based one.</p>
+
+<p>You can see that <a href="https://github.com/timshannon/townsourced/blob/master/web/gobblefile.js#L138">here</a> and how it was used
+<a href="https://github.com/timshannon/townsourced/blob/master/web/src/js/components/post.html#L74">here</a>.</p>
+
+<hr />
+
+<p>There are many other things I could cover with more detail, like:</p>
+
+<ul>
+<li><a href="https://github.com/timshannon/townsourced/blob/master/data/image.go">Automatically generating tiny, blurred placeholder images</a>
+to <a href="https://github.com/timshannon/townsourced/blob/master/web/src/js/components/image.html">show when posts are loading</a></li>
+<li>Easy <a href="https://github.com/timshannon/townsourced/blob/master/app/shareParsers.go">sharing of existing posts</a>
+from other sites <a href="https://github.com/timshannon/townsourced/blob/master/web/src/js/bookmarklet.js">with townsourced</a></li>
+<li>Making a large <a href="https://github.com/timshannon/townsourced/blob/master/web/src/pitch.html">interactive SVG for the Pitch page</a></li>
+<li>How to do <a href="https://github.com/timshannon/townsourced/blob/master/data/comment.go">nested comments with Rethinkdb</a></li>
+</ul>
+
+<p>But I&rsquo;ll save those details for possible future posts.  If anyone is interested, <a href="mailto:tim@townsourced.com">let me know</a>.</p>
+
+<p>Hopefully there are a few things in the repository that you may find useful.  If so, I&rsquo;d love to hear about it.  Either
+way it&rsquo;s out there now, and under an <a href="https://github.com/timshannon/townsourced/blob/master/LICENSE">MIT license</a>, for
+you to do with it as you like.</p>
+
+												</div>
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															
+																<span>
+																	<a href="http://tech.townsourced.com/tags/development">
+																		<a href="http://tech.townsourced.com/categories/development">Development</a>
+																	</a>
+																</span>
+															
+													</span>
+
+													<ul class="list-inline tags text-right">
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/go">
+																	<span class="label label-theme">#Go</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/web-development">
+																	<span class="label label-theme">#Web Development</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/townsourced">
+																	<span class="label label-theme">#Townsourced</span>
+																</a>
+															</li>
+														
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "techtownsourcedcom" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+												</div>
+                    </div>                 
+									</section>
+                
+            </div>
+						<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div>  
+				</div>                 
+		</aside>
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						
+							<li>
+								<a href="http://tech.townsourced.com/categories/development">development</a>
+							</li>
+						
+					</ul>
+					<hr>
+					<ul class="list-inline tags">
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/authentication">
+									<span class="label label-theme">#authentication</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/go">
+									<span class="label label-theme">#go</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/reference">
+									<span class="label label-theme">#reference</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/townsourced">
+									<span class="label label-theme">#townsourced</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/tutorial">
+									<span class="label label-theme">#tutorial</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/web-development">
+									<span class="label label-theme">#web-development</span>
+								</a>
+							</li>
+						
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="https://www.townsourced.com" target="_blank"><i class="fa fa-external-link"></i>Townsourced</a></h3>
+										<p class="description">
+											A locally moderated community bulletin board, built to help communities discover events, share, shop and sell locally.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on BoltDB.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div>  
+				</div>                 
+		</aside>
+</div>
+
+					</div>
+    </div>
+	 
+<footer class="footer">
+		<div class="container text-center">
+						<small class="copyright">
+							<div>© <a href="https://solutions.townsourced.com" target="_blank">Townsourced</a>  - design modified from template by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a></div>
+							<div>
+						Unless otherwise noted, content is released under a  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</div>
+						</small>
+		</div>
+</footer>
+
+<script type="text/javascript" src="http://tech.townsourced.com/js/prism.js"></script>            
+
+
+<script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
+
+
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    _paq.push(['setTrackerUrl',  'https://api-e68fcf7f9c66665c7e009b9f533bdf6f.townsourced.com']);
+    _paq.push(['setSiteId', 2]);
+    _paq.push(['setApiToken', 'E80SMnaO8kFL-gyxQRvLEUTUOCv6zi3R63VALxf64ft']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://5plhgbtl6we7tvxqeqt1.townsourced.com/embed.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+
+
+
+    
+
+	<script type="text/javascript">
+		
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
+</body>
+</html> 

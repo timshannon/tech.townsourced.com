@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://tech.townsourced.com/</loc>
-    <lastmod>2017-01-15T19:05:51-06:00</lastmod>
+    <loc>http://tech.townsourced.com/post/townsourced-open-sourced/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -14,6 +15,71 @@
   <url>
     <loc>http://tech.townsourced.com/post/anatomy-of-a-go-web-app/</loc>
     <lastmod>2016-12-04T10:37:07-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/authentication/</loc>
+    <lastmod>2017-01-15T19:05:51-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/categories/development/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/go/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/post/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/reference/</loc>
+    <lastmod>2017-01-15T19:05:51-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/</loc>
+    <lastmod>2017-01-15T19:05:51-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/townsourced/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/tutorial/</loc>
+    <lastmod>2017-01-15T19:05:51-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/tags/web-development/</loc>
+    <lastmod>2017-11-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>
