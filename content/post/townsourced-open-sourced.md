@@ -34,7 +34,7 @@ The quickest way to run Townsourced is with Docker.  Install [Docker](https://ww
 This will start a containerized instance of townsourced listening on port `8080`, running with RethinkDB, Elasticsearch
 and Memcached.
 
-The Docker Compose file can be found [here](https://github.com/timshannon/townsourced/blob/master/docker-compose.yaml).
+The Docker Compose file can be found [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/docker-compose.yaml).
 
 # Building
 
@@ -121,7 +121,7 @@ across communities, but communities could still moderate a post in one Town with
 ![Multi-town Posts](/images/post/townsourced-opensourced/multi-town.png "Multi-town Posts")
 
 You can see the Post structure, and how it tracks Towns and moderation 
-[here](https://github.com/timshannon/townsourced/blob/master/app/post.go#L99).
+[here](https://github.com/timshannon/townsourced/blob/open-source-post-links/app/post.go#L99).
 
 ## Private package for open source release
 I knew I wanted to eventually open-source Townsourced regardless of whatever came of it, so I made sure that I kept
@@ -129,9 +129,9 @@ anything that I didn't want to be released to the public (API keys, passwords, e
 could be easily removed.
 
 All of the API keys that Townsourced uses are stored here, from Facebook to the the client side Google Maps API key,
-which is [inserted into the html template](https://github.com/timshannon/townsourced/blob/master/web/src/townSearch.template.html#L168).
+which is [inserted into the html template](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/townSearch.template.html#L168).
 
-You can see that package [here](https://github.com/timshannon/townsourced/blob/master/data/private/private.go).
+You can see that package [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/private/private.go).
 
 If you want to run Townsourced for yourself you can get each one of the API keys used for free without committing to any
 subscription or fees.  The [Google Maps API key](https://developers.google.com/maps/documentation/embed/get-api-key)
@@ -156,10 +156,10 @@ I handled this by generating a small random value with any object I wanted to ve
 it checks if the current version matches the passed in version with the update.  If the version doesn't match, the user gets
 a message saying their screen is out of date and they need to refresh the page.
 
-Go makes it easy to embed this [version struct](https://github.com/timshannon/townsourced/blob/master/data/version.go#L42)
-that handles the update logic into [existing structs](https://github.com/timshannon/townsourced/blob/master/app/town.go#L22).
+Go makes it easy to embed this [version struct](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/version.go#L42)
+that handles the update logic into [existing structs](https://github.com/timshannon/townsourced/blob/open-source-post-links/app/town.go#L22).
 
-You can see how that works [here](https://github.com/timshannon/townsourced/blob/master/data/version.go).
+You can see how that works [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/version.go).
 
 ## Less in Ractive Components
 When I first started Townsourced, [Vue](https://vuejs.org/) was just getting rolling, and I hadn't even heard of it yet.
@@ -173,22 +173,22 @@ a small section into my build scripts to let me compile less into my Ractive com
 that the Vue ecosystem now handles automatically for you.  It's also a reason why I will also favor a programmable build 
 tool over a configuration based one.
 
-You can see that [here](https://github.com/timshannon/townsourced/blob/master/web/gobblefile.js#L138) and how it was used
-[here](https://github.com/timshannon/townsourced/blob/master/web/src/js/components/post.html#L74).
+You can see that [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/gobblefile.js#L138) and how it was used
+[here](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/components/post.html#L74).
 
 -----------------------
 
 There are many other things I could cover with more detail, like:
 
-* [Automatically generating tiny, blurred placeholder images](https://github.com/timshannon/townsourced/blob/master/data/image.go)
-to [show when posts are loading](https://github.com/timshannon/townsourced/blob/master/web/src/js/components/image.html)
-* Easy [sharing of existing posts](https://github.com/timshannon/townsourced/blob/master/app/shareParsers.go)
- from other sites [with townsourced](https://github.com/timshannon/townsourced/blob/master/web/src/js/bookmarklet.js)
-* Making a large [interactive SVG for the Pitch page](https://github.com/timshannon/townsourced/blob/master/web/src/pitch.html)
-* How to do [nested comments with Rethinkdb](https://github.com/timshannon/townsourced/blob/master/data/comment.go)
+* [Automatically generating tiny, blurred placeholder images](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/image.go)
+to [show when posts are loading](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/components/image.html)
+* Easy [sharing of existing posts](https://github.com/timshannon/townsourced/blob/open-source-post-links/app/shareParsers.go)
+ from other sites [with townsourced](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/bookmarklet.js)
+* Making a large [interactive SVG for the Pitch page](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/pitch.html)
+* How to do [nested comments with Rethinkdb](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/comment.go)
 
 But I'll save those details for possible future posts.  If anyone is interested, [let me know](mailto:tim@townsourced.com).
 
 Hopefully there are a few things in the repository that you may find useful.  If so, I'd love to hear about it.  Either
-way it's out there now, and under an [MIT license](https://github.com/timshannon/townsourced/blob/master/LICENSE), for 
+way it's out there now, and under an [MIT license](https://github.com/timshannon/townsourced/blob/open-source-post-links/LICENSE), for 
 you to do with it as you like.
