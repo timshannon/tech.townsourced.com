@@ -495,3 +495,8 @@ pre {
 	background-color: #272822;
 	color: #f8f8f2;
 }
+
+section.post img {
+  width: 100%;
+  height: auto;
+}
