@@ -30,7 +30,7 @@
   
   <url>
     <loc>http://tech.townsourced.com/categories/development/</loc>
-    <lastmod>2017-11-25T00:00:00+00:00</lastmod>
+    <lastmod>2017-01-15T19:05:51-06:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -49,6 +49,12 @@
   <url>
     <loc>http://tech.townsourced.com/tags/reference/</loc>
     <lastmod>2017-01-15T19:05:51-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.townsourced.com/categories/releases/</loc>
+    <lastmod>2017-11-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
