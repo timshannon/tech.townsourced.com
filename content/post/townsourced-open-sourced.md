@@ -1,9 +1,9 @@
 +++
 title = "Townsourced Open-sourced"
 date = "2017-11-25"
-categories = ["Development"]
+categories = ["Releases"]
 tags = ["Go", "Web Development", "Townsourced"]
-keywords = ["web development", "go", "golang", "backend development", "open-source"]
+keywords = ["web development", "go", "golang", "backend development", "open-source", "community"]
 +++
 
 My goal with Townsourced was first and foremost to build something useful for local, small communities.  I felt local
