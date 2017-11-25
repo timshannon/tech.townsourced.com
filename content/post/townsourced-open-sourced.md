@@ -1,6 +1,6 @@
 +++
 title = "Townsourced Open-sourced"
-date = "2017-11-22"
+date = "2017-11-25"
 categories = ["Development"]
 tags = ["Go", "Web Development", "Townsourced"]
 keywords = ["web development", "go", "golang", "backend development", "open-source"]
@@ -38,7 +38,7 @@ The Docker Compose file can be found [here](https://github.com/timshannon/townso
 
 # Building
 
-Townsourced is written in go, and all of it's dependencies are vendored.  You can build townsourced by simply running
+Townsourced is written in Go, and all of it's dependencies are vendored.  You can build townsourced by simply running
 `go get github.com/timshannon/townsourced`.
 
 To build the web / client portion you'll need to install [gobble](https://github.com/gobblejs/gobble)
