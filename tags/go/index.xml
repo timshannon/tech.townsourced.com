@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
-    <lastBuildDate>Sat, 25 Nov 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 28 Nov 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://tech.townsourced.com/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Townsourced Open-sourced</title>
       <link>http://tech.townsourced.com/post/townsourced-open-sourced/</link>
-      <pubDate>Sat, 25 Nov 2017 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>
       
       <guid>http://tech.townsourced.com/post/townsourced-open-sourced/</guid>
       <description>My goal with Townsourced was first and foremost to build something useful for local, small communities. I felt local communities were very under-represented online, and the social networks available catered either to large communities or niche communities of shared interest. My target audience was small, local communities: small towns, college campuses, neighborhoods, churches, schools. I wanted to build something that handled the overlap between those local communities better than existing options.</description>
