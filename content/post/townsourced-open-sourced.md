@@ -6,6 +6,8 @@ tags = ["Go", "Web Development", "Townsourced"]
 keywords = ["web development", "go", "golang", "backend development", "open-source", "community"]
 +++
 
+**TLDR: Grab the code here: https://github.com/timshannon/townsourced and run `docker-compose up`**
+
 My goal with Townsourced was first and foremost to build something useful for local, small communities.  I felt local
 communities were very under-represented online, and the social networks available catered either to large communities or niche
 communities of shared interest.  My target audience was small, local communities: small towns, college campuses, 
