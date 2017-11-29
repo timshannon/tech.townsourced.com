@@ -1,6 +1,6 @@
 +++
 title = "Townsourced Open-sourced"
-date = "2017-11-25"
+date = "2017-11-28"
 categories = ["Releases"]
 tags = ["Go", "Web Development", "Townsourced"]
 keywords = ["web development", "go", "golang", "backend development", "open-source", "community"]
@@ -17,8 +17,8 @@ better than existing options.
 It started as a small side project, and grew from there.  I showed it to a few angel investors, and demoed it to the
 Minneapolis Tech community at [Minnedemo](https://minnestar.org/minnedemo/), but it never went any further than that.
 
-I've finally gotten around to open sourcing it, and I believe there are a few interesting things in the source code that
-I hope will, at a minimum, be useful as an example.
+I firmly believe that open-source is important, and I want to contribute back in any way I can. There are a few 
+interesting things in Townsourced's code that I hope will, at a minimum, be useful as an example.
 
 You can access a live version of this code running at [https://www.townsourced.com](https://www.townsourced.com) which 
 I plan to keep running.
@@ -31,14 +31,14 @@ send me a message at [tim@townsourced.com](mailto:tim@townsourced.com).
 The quickest way to run Townsourced is with Docker.  Install [Docker](https://www.docker.com/) and 
 [Docker-Compose](https://docs.docker.com/compose/install/), then run `docker-compose up`.
 
-This will start a containerized instance of townsourced listening on port `8080`, running with RethinkDB, Elasticsearch
+This will start a containerized instance of Townsourced listening on port `8080`, running with RethinkDB, Elasticsearch
 and Memcached.
 
 The Docker Compose file can be found [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/docker-compose.yaml).
 
 # Building
 
-Townsourced is written in Go, and all of it's dependencies are vendored.  You can build townsourced by simply running
+Townsourced is written in Go, and all of it's dependencies are vendored.  You can build Townsourced by simply running
 `go get github.com/timshannon/townsourced`.
 
 To build the web / client portion you'll need to install [gobble](https://github.com/gobblejs/gobble)
@@ -49,9 +49,9 @@ Then run `gobble build static -f` in the `web` folder.
 
 # Deploying
 
-The easiest way to deploy townsourced is to use the Docker.  The `docker-compose.yaml` file can be used to run the
+The easiest way to deploy Townsourced is to use the Docker.  The `docker-compose.yaml` file can be used to run the
 entire stack, or give you an insight into what services are needed.  Simply run `docker-compose up` and you'll have
-a running instance of townsourced at http://localhost:8080.
+a running instance of Townsourced at http://localhost:8080.
 
 To deploy Townsourced manually, you'll need:
 
@@ -105,7 +105,7 @@ Here is an example of what that looks like:
 }
 ```
 
-Finally, you'll need a `web/static` folder (built from gobble) in the running directory of townsourced.
+Finally, you'll need a `web/static` folder (built from gobble) in the running directory of Townsourced.
 
 # Items of Interest
 I've dived into more detail in the [Anatomy of a Go Web Application](/post/anatomy-of-a-go-web-app/) and 
@@ -135,7 +135,7 @@ You can see that package [here](https://github.com/timshannon/townsourced/blob/o
 
 If you want to run Townsourced for yourself you can get each one of the API keys used for free without committing to any
 subscription or fees.  The [Google Maps API key](https://developers.google.com/maps/documentation/embed/get-api-key)
-would be a minimum to have for a lot of the UI functionality to work.
+would be a minimum requirement to have for a lot of the UI functionality to work.
 
 ## Attribution
 Open-source is important, and Townsourced relies heavily on open-source technologies.  Most open-source licenses are
@@ -170,8 +170,8 @@ to build a UI in pieces and reuse them as needed.
 However, I quickly ran into issues where I was having to duplicate many of the variables that were defined in my `.less` files
 into my components.  Luckily my build tool of choice ([Gobble](https://github.com/gobblejs/gobble)) made it easy to write
 a small section into my build scripts to let me compile less into my Ractive components.  This is, of course, something 
-that the Vue ecosystem now handles automatically for you.  It's also a reason why I will also favor a programmable build 
-tool over a configuration based one.
+that the Vue ecosystem now handles automatically for you.  This flexibility is also a reason why I will always favor a 
+programmable build tool over a configuration based one.
 
 You can see that [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/gobblefile.js#L138) and how it was used
 [here](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/components/post.html#L74).
@@ -183,7 +183,7 @@ There are many other things I could cover with more detail, like:
 * [Automatically generating tiny, blurred placeholder images](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/image.go)
 to [show when posts are loading](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/components/image.html)
 * Easy [sharing of existing posts](https://github.com/timshannon/townsourced/blob/open-source-post-links/app/shareParsers.go)
- from other sites [with townsourced](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/bookmarklet.js)
+ from other sites [with Townsourced](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/js/bookmarklet.js)
 * Making a large [interactive SVG for the Pitch page](https://github.com/timshannon/townsourced/blob/open-source-post-links/web/src/pitch.html)
 * How to do [nested comments with Rethinkdb](https://github.com/timshannon/townsourced/blob/open-source-post-links/data/comment.go)
 
