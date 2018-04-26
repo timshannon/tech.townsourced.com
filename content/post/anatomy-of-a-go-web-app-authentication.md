@@ -3,8 +3,8 @@ title = "Anatomy of a Go Web App - Part 2: Authentication"
 draft = false
 date = "2017-01-15T19:05:51-06:00"
 categories = ["Development"]
-tags = ["Go", "Web Development", "tutorial", "reference", "authentication"]
-keywords = ["web development", "go", "golang", "backend development", "passwords", "oauth", "security", "best practice"]
+tags = ["Go", "Web Development", "tutorial", "reference", "authentication", "Townsourced"]
+keywords = ["web development", "go", "golang", "backend development", "passwords", "oauth", "security", "best practice", "Townsourced"]
 +++
 
 This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for

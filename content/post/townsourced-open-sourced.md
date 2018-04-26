@@ -2,8 +2,8 @@
 title = "Townsourced Open-sourced"
 date = "2017-11-28"
 categories = ["Releases"]
-tags = ["Go", "Web Development", "Townsourced"]
-keywords = ["web development", "go", "golang", "backend development", "open-source", "community"]
+tags = ["Go", "Web Development", "Townsourced", "Townsourced"]
+keywords = ["web development", "go", "golang", "backend development", "open-source", "community", "Townsourced"]
 +++
 
 **TLDR: Grab the code here: https://github.com/timshannon/townsourced and run `docker-compose up`**

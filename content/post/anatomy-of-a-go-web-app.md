@@ -3,8 +3,8 @@ title = "Anatomy of a Go Web Application"
 draft = false
 date = "2016-12-04T10:37:07-06:00"
 categories = ["Development"]
-tags = ["Go", "Web Development", "tutorial", "reference"]
-keywords = ["web development", "go", "golang", "backend development"]
+tags = ["Go", "Web Development", "tutorial", "reference", "Townsourced"]
+keywords = ["web development", "go", "golang", "backend development", "Townsourced"]
 +++
 
 When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give 
