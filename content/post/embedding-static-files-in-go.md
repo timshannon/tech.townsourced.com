@@ -1,7 +1,7 @@
 ---
 title: "Choosing A Library to Embed Static Assets in Go"
 draft: true
-date: "2018-04-24T19:05:51-06:00"
+date: "2018-04-25T19:05:51-06:00"
 categories: 
   - Development
 tags: 
@@ -26,9 +26,9 @@ keywords:
 # Background
 One of the oft-touted benefits of Go is that applications written in it are easily deployed because they are 
 statically complied.  A lot of this benefit goes away if you need to manage the location and permissions on a bunch of
-static files needed by the running web application.
+files needed to run a web application.
 
-The solution is to compile any necessary files into the application binary itself.  This can be in Go by using
+The solution is to compile any necessary files into the application binary itself.  This can be done in Go by using
 a byte slice literal containing the [string representation](https://golang.org/ref/spec#String_literals) of the bytes in
 a file.
 
@@ -39,26 +39,26 @@ a file.
 The biggest downsides to this approach are:
 
 * **Larger binaries**
-	* For [Lex Library](https://github.com/lexlibrary/lexlibrary) I'm seeing a 20 MB executable without embedded 
+	* For my current project [Lex Library](https://github.com/lexlibrary/lexlibrary) I'm seeing a 20 MB executable without embedded 
 	assets, and a 21 MB executable with them.
 * **Longer compilation**
 	* This is mostly mitigated by the [latest caching](https://golang.org/doc/go1.10#build) in the Go compiler.
 * **Increased memory during compilation**
 	* This may bite you if you are developing on low memory devices, but for me personally this hasn't been a concern.
 
-You are essentially making a trade-off between development time and operational management time.  If you application's intended
+You are essentially making a trade-off between development time and operational management time.  If your application's intended
 audience is the general public (or at least the really geeky public that host their own web apps), this trade off is more
 than worthwhile.
 
 # Embedding Options
 Perhaps the first library, or at least the first really popular one, to handle embedding static assets in Go applications
 is [jteeuwen's Go-BinData](https://github.com/jteeuwen/go-bindata).  It's a command line application that you pass a
-directory path to and it generates a `.go` file with your embedded assets.  
+directory path to and it generates a `.go` file with your assets embedded in it.  
 
-Unfortunately jteeuwen seems to have dropped off the face of the planet, deleting all of this repositories from github 
+Unfortunately, jteeuwen seems to have dropped off the face of the planet, deleting all of this repositories from github 
 as he left.  Luckily for all of us, his code was open-source and so was forked by the community at large. You can find 
 several, well-maintained forks of his code on github.  My fork of choice was [shuLhan's](https://github.com/shuLhan/go-bindata), 
-but I have since moved onto other options, the reasons for which, I get into below.
+but I have since moved onto other options, the reasons for which, I'll get into below.
 
 More details on the jteewen repo are here: https://github.com/jteeuwen/go-bindata/issues/5 
 
@@ -81,7 +81,7 @@ while researching this myself:
 * **gobundle** - https://github.com/alecthomas/gobundle
 * **parcello** - https://github.com/phogolabs/parcello
 
-The main goal of this post is to help you sort through differences and features that you should be thinking about
+The main goal of this post is to help you sort through differences and help you determine which features you should consider
 when choosing one of these libraries.
 
 # Separating the Wheat from the Chaff
@@ -96,8 +96,8 @@ same decision.
 As mentioned before, one of the downsides to embedding static files is that it increases the size of the executable.
 You can alleviate some of that by using a library that compresses the files before embedding them.  It is usually worth
 the small cost of decompression to save space as well as less memory usage when compiling.  Also, static web files tend to
-compress really well (other than images, which are already compressed), which is why most web browsers support receiving
-gzip compressed files.  This leads us to my next criterion.
+compress really well (other than images), which is why most web browsers support receiving
+gzip compressed files.  This leads directly to my next criterion.
 
 ### Optional Decompression
 If your static files are stored in your executable with gzip compression, and you are going to potentially serve up those
@@ -121,11 +121,11 @@ go-bindata library, and this fork looked well maintained.
 The library was working great, but, out of the blue, my CI builds started failing.  Like every developer when their tests
 start failing, my first thought was ***what changed***.  I immediately checked my last commit, and tried to figure out how that
 change broke my template handling.  After scratching my head for a while, unable to find a culprit, I re-ran my test 
-suite against the last successful build and found that those too were all of a sudden failing.  That told me the change
+suite against the last successful build and found that those *too* were failing.  That told me the change
 had to be environmental, and *not* in my code.  However, that raised more questions.  
 
 I run my Continuous Integration tests in [Docker containers](https://www.docker.com/).  The environments should be 
-self-contained, pristine, and reproducible. Somewhere my assumption about that was wrong.  Stepping through my 
+self-contained, pristine, and reproducible. Somewhere my assumptions about that were wrong.  Stepping through my 
 `Dockerfile`, I found my culprit:
 
 ```docker
@@ -134,8 +134,9 @@ RUN go get -u github.com/shuLhan/go-bindata/...
 
 There was a small update to the go-bindata library that broke how I was passing in the path to my static files.  All
 of a sudden my embedded files weren't on the paths I was expecting.  Now, this could be blamed on several factors such
-as the fact that go get always gets the default branch.  In the end it came down to the fact that a process that was
-generating code in my application wasn't being versioned and tracked inside my git repo, or by my build tools.
+as the fact that go get always gets the default branch.  In the end, it came down to the simple truth that a process which was
+generating code in my application wasn't being versioned and tracked inside my git repo.  External changes on a dependency
+of mine could break my builds or my tests without me knowing.
 
 One way to fix this issue was to store a copy of the pre-compiled go-bindata executable in my git repo, but:
 
@@ -144,8 +145,8 @@ One way to fix this issue was to store a copy of the pre-compiled go-bindata exe
 3. It would make it much harder to build on any other platform other than the one I develop on.
 
 Alternately, I could find a library that *didn't* require a stand-alone executable, and relied entirely on code that
-is vendored in my git repo. This meant a library that supported `go generate`, and more specifically go generate *and*
-didn't rely on an external executable to run.
+is vendored in my git repo. This meant a library that supported `go generate`, and more specifically, one that didn't 
+rely on an external executable to run.
 
 ### Additional Criteria
 As I mentioned before, you may have different requirements than I do, so in my comparison table below I included a
@@ -188,11 +189,8 @@ arbitrary number of stars, so keep that in mind.
 \* *Additional code required*
 
 My experience with these libraries vary from writing and deploying applications with them, to simply looking through
-their `README` and documentation.
-
-If you find any inaccuracies in the table, please let me know in the comments and I'll update them.
-
-Thanks,
+their `README` and documentation.  If you find any inaccuracies in the table, please let me know in the comments and 
+I'll update them.
 
 # My Choice
 
@@ -200,4 +198,3 @@ The comparison table makes it pretty clear why I ended up going with [vfsgen](ht
 highly recommend it, especially if you require reproducible builds.  A close runner up was 
 [fileb0x](https://github.com/UnnoTed/fileb0x), but unfortunately, it's usage of `go generate` required a stand-alone
 executable to run.
-
