@@ -1,7 +1,7 @@
 ---
 title: "Choosing A Library to Embed Static Assets in Go"
-draft: true
-date: "2018-04-25T19:05:51-06:00"
+draft: false
+date: "2018-04-26T20:50:00-06:00"
 categories: 
   - Development
 tags: 
