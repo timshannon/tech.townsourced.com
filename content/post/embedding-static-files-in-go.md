@@ -28,7 +28,7 @@ One of the oft-touted benefits of Go is that applications written in it are easi
 statically complied.  A lot of this benefit goes away if you need to manage the location and permissions on a bunch of
 static files needed by the running web application.
 
-The solution is to statically compile any necessary files into the application binary itself.  This can be in Go by using
+The solution is to compile any necessary files into the application binary itself.  This can be in Go by using
 a byte slice literal containing the [string representation](https://golang.org/ref/spec#String_literals) of the bytes in
 a file.
 
@@ -39,7 +39,8 @@ a file.
 The biggest downsides to this approach are:
 
 * **Larger binaries**
-	* For [Lex Library](https://github.com/lexlibrary/lexlibrary) I'm seeing a 20 MB executable without embedded assets, and a 20 MB executable with them.
+	* For [Lex Library](https://github.com/lexlibrary/lexlibrary) I'm seeing a 20 MB executable without embedded 
+	assets, and a 21 MB executable with them.
 * **Longer compilation**
 	* This is mostly mitigated by the [latest caching](https://golang.org/doc/go1.10#build) in the Go compiler.
 * **Increased memory during compilation**
@@ -57,12 +58,12 @@ directory path to and it generates a `.go` file with your embedded assets.
 Unfortunately jteeuwen seems to have dropped off the face of the planet, deleting all of this repositories from github 
 as he left.  Luckily for all of us, his code was open-source and so was forked by the community at large. You can find 
 several, well-maintained forks of his code on github.  My fork of choice was [shuLhan's](https://github.com/shuLhan/go-bindata), 
-but I have since moved onto other options, the reasons for which I get into below.
+but I have since moved onto other options, the reasons for which, I get into below.
 
-More details on the jteewen repo here: https://github.com/jteeuwen/go-bindata/issues/5 
+More details on the jteewen repo are here: https://github.com/jteeuwen/go-bindata/issues/5 
 
 ## Alternatives
-Since jteewen's library there have been many, many alternatives written.  Below is a *non-comprensive* list I put together 
+Since jteewen's library there have been many, many alternatives.  Below is a *non-comprensive* list I put together 
 while researching this myself:
 
 * **vfsgen** - https://github.com/shurcooL/vfsgen
@@ -79,6 +80,9 @@ while researching this myself:
 * **fileb0x** - https://github.com/UnnoTed/fileb0x
 * **gobundle** - https://github.com/alecthomas/gobundle
 * **parcello** - https://github.com/phogolabs/parcello
+
+The main goal of this post is to help you sort through differences and features that you should be thinking about
+when choosing one of these libraries.
 
 # Separating the Wheat from the Chaff
 With so many options, it can be overwhelming to determine which library will work best for your purposes. While your
@@ -98,7 +102,7 @@ gzip compressed files.  This leads us to my next criterion.
 ### Optional Decompression
 If your static files are stored in your executable with gzip compression, and you are going to potentially serve up those
 files to your client with gzip compression, why not just send them the already compressed file data?  The ideal library
-would give you the option to retrieve the already compressed file without decompressing it first.
+would give you the option, at runtime, to retrieve the already compressed file without decompressing it first.
 
 ### Loading from the local File System
 When you are developing your web application, anything that adds time or friction between when you *make* a change and
@@ -110,12 +114,12 @@ on-the-fly, and your production build, where the files are fully embedded into e
 
 ### Reproducible Builds
 This criterion took me by surprise, and I didn't consider it originally when I started development on 
-[Lex Library](https://github.com/lexlibrary/lexlibrary). As mentioned earlier, my first choice was [go-bindata fork by
+[Lex Library](https://github.com/lexlibrary/lexlibrary). As mentioned earlier, my first choice was a [go-bindata fork by
 shuLhan](https://github.com/shuLhan/go-bindata).  I chose it mainly because I was already familiar with the original
 go-bindata library, and this fork looked well maintained.  
 
-The library was working great, but, out of the blue, my CI builds started failing.  Every developer's first thought when
-their tests start failing is ***what changed***.  I immediately checked my last commit, and tried to figure out how that
+The library was working great, but, out of the blue, my CI builds started failing.  Like every developer when their tests
+start failing, my first thought was ***what changed***.  I immediately checked my last commit, and tried to figure out how that
 change broke my template handling.  After scratching my head for a while, unable to find a culprit, I re-ran my test 
 suite against the last successful build and found that those too were all of a sudden failing.  That told me the change
 had to be environmental, and *not* in my code.  However, that raised more questions.  
@@ -130,22 +134,22 @@ RUN go get -u github.com/shuLhan/go-bindata/...
 
 There was a small update to the go-bindata library that broke how I was passing in the path to my static files.  All
 of a sudden my embedded files weren't on the paths I was expecting.  Now, this could be blamed on several factors such
-as the fact that go get always gets the default branch, but in the end it came down to the fact that a process that was
+as the fact that go get always gets the default branch.  In the end it came down to the fact that a process that was
 generating code in my application wasn't being versioned and tracked inside my git repo, or by my build tools.
 
 One way to fix this issue was to store a copy of the pre-compiled go-bindata executable in my git repo, but:
 
-1. It's usually not a good idea to store binary blobs in git
-2. I'd have to manually update it every time there was a bug fix
-3. It would make it much harder to build on any other platform other than the one I develop on
+1. It's usually not a good idea to store binary blobs in git.
+2. I'd have to manually update it every time there was a bug fix.
+3. It would make it much harder to build on any other platform other than the one I develop on.
 
 Alternately, I could find a library that *didn't* require a stand-alone executable, and relied entirely on code that
 is vendored in my git repo. This meant a library that supported `go generate`, and more specifically go generate *and*
 didn't rely on an external executable to run.
 
 ### Additional Criteria
-As I mentioned before you may have different requirements than I do, so in my comparison table below I included a
-few additional criteria that may be useful.
+As I mentioned before, you may have different requirements than I do, so in my comparison table below I included a
+few additional criteria that you may find useful.
 
 #### Config File
 If you have a lot of different folders and files to manage, it can be easier to manage them via a config file checked 
@@ -156,38 +160,44 @@ Using a library that satisfies the [http.FileSystem](https://golang.org/pkg/net/
 much easier to work with the embedded files.
 
 #### Greater than 200 Github Stars
-While this can be a bit arbitrary, and it's not necessarily a measure of quality, a repo's number stars *can* be a good
-indicator of an active library, or at least one that's used in a lot of	places, which in turn *could* mean that a lot of
+While this is a bit arbitrary, and it's not *necessarily* a measure of quality, a repo's number of stars *can* be a good
+indicator of an active library, or at least one that's used in a lot of	places. This, in turn, *could* mean that a lot of
 people are battle testing it, and / or submitting bug reports. The library I chose, just *barely* made it past this 
-arbitrary number of stars.
+arbitrary number of stars, so keep that in mind.
 
 
 # Comparison 
 
-The table below makes it pretty clear why I ended up going with [vfsgen](https://github.com/shurcooL/vfsgen), and I 
-highly recommend it, especially if you require reproducible builds.
-
 | Library | [Compression](#compression)	| [Opt. decompression](#optional-decompression)	| [Local FS](#loading-from-the-local-file-system) | [go generate](#reproducible-builds) | [No EXE](#reproducible-builds) | [(Config File](#config-file)	| [http.FS](#http-filesystem-interface)	| [> 200 Stars](#greater-than-200-github-stars)	|
-| -----------------------------------------------------	| ------------- | -------------	| ------------- | ------------- | -------------	| -------------	| ------------- | -------------	|
-| **[vfsgen](https://github.com/shurcooL/vfsgen)**  	| **YES**	| **YES** 	| **YES**	| **YES**	| **YES**	| NO		| **YES**	| **YES**	|
-| **[go.rice](https://github.com/GeertJohan/go.rice)** 	| **YES**	| NO	 	| **YES**	| NO		| NO		| NO		| **YES**	| **YES**	|
-| **[statik](https://github.com/rakyll/statik)** 	| **YES**	| NO	 	| NO		| NO		| NO		| NO		| **YES**	| **YES**	|
-| **[esc](https://github.com/mjibson/esc)**	 	| **YES**	| NO	 	| **YES**	| **YES**	| NO		| NO		| **YES**	| **YES**	|
-| **[go-embed](https://github.com/pyros2097/go-embed)**	| **YES**	| NO	 	| NO		| **YES**	| NO		| NO		| NO		| NO		|
+| -----------------------------------------------------		| ------------- | -------------	| ------------- | ------------- | -------------	| -------------	| ------------- | -------------	|
+| **[vfsgen](https://github.com/shurcooL/vfsgen)**  		| **YES**	| **YES** 	| **YES**\*	| **YES**	| **YES**	| NO		| **YES**	| **YES**	|
+| **[go.rice](https://github.com/GeertJohan/go.rice)** 		| **YES**	| NO	 	| **YES**	| NO		| NO		| NO		| **YES**	| **YES**	|
+| **[statik](https://github.com/rakyll/statik)** 		| **YES**	| NO	 	| NO		| NO		| NO		| NO		| **YES**	| **YES**	|
+| **[esc](https://github.com/mjibson/esc)**	 		| **YES**	| NO	 	| **YES**	| **YES**	| NO		| NO		| **YES**	| **YES**	|
+| **[go-embed](https://github.com/pyros2097/go-embed)**		| **YES**	| NO	 	| **YES**\*	| NO		| NO		| NO		| NO		| NO		|
+| **[go-resources](https://github.com/omeid/go-resources)**	| NO		| NO	 	| **YES**\*	| NO		| NO		| NO		| **YES**	| NO		|
+| **[packr](https://github.com/gobuffalo/packr)**		| **YES**	| NO	 	| **YES**	| NO		| NO		| NO		| **YES**	| **YES**	|
+| **[statics](https://github.com/go-playground/statics)**	| **YES**	| NO	 	| **YES**	| **YES**	| NO		| NO		| **YES**	| NO		|
+| **[templify](https://github.com/wlbr/templify)**		| NO		| NO	 	| **YES**	| **YES**	| NO		| NO		| NO		| NO		|
+| **[gnoso/go-bindata](https://github.com/gnoso/go-bindata)**	| **YES**	| NO	 	| NO		| NO		| NO		| NO		| NO		| **YES**	|
+| **[shuLhan/go-bindata](https://github.com/shuLhan/go-bindata)**| **YES**	| NO	 	| **YES**	| NO		| NO		| NO		| NO		| NO		|
+| **[fileb0x](https://github.com/UnnoTed/fileb0x)**		| **YES**	| **YES** 	| **YES**	| **YES**	| NO		| **YES**	| **YES**	| **YES**	|
+| **[gobundle](https://github.com/alecthomas/gobundle)**	| **YES**	| NO	 	| NO		| NO		| NO		| NO		| NO		| NO		|
+| **[parcello](https://github.com/phogolabs/parcello)**		| **YES**	| NO 	 	| YES 		| **YES**	| NO 		| NO  		| **YES**	| **YES**	|
 
-* **go-resources** - https://github.com/omeid/go-resources
-* **packr** - https://github.com/gobuffalo/packr
-* **statics** - https://github.com/go-playground/statics
-* **templify** - https://github.com/wlbr/templify
-* **gnoso/go-bindata** - https://github.com/gnoso/go-bindata
-* **shuLhan/go-bindata** - https://github.com/shuLhan/go-bindata
-* **fileb0x** - https://github.com/UnnoTed/fileb0x
-* **gobundle** - https://github.com/alecthomas/gobundle
-* **parcello** - https://github.com/phogolabs/parcello
+\* *Additional code required*
+
 My experience with these libraries vary from writing and deploying applications with them, to simply looking through
-their *README* and documentation.
+their `README` and documentation.
 
 If you find any inaccuracies in the table, please let me know in the comments and I'll update them.
 
 Thanks,
+
+# My Choice
+
+The comparison table makes it pretty clear why I ended up going with [vfsgen](https://github.com/shurcooL/vfsgen), and I 
+highly recommend it, especially if you require reproducible builds.  A close runner up was 
+[fileb0x](https://github.com/UnnoTed/fileb0x), but unfortunately, it's usage of `go generate` required a stand-alone
+executable to run.
 
