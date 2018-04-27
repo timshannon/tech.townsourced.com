@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+  
+  
+ <html lang="en">   
+<head>
+
+    <title>Choosing A Library to Embed Static Assets in Go</title>
+
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
+
+<meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,web development, go, golang, development, passwords, CI, Continuous Integration, Lex Library, best practices, gotchas, ">
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content=""/>
+<meta property="og:title" content="Choosing A Library to Embed Static Assets in Go : tech.townsourced.com"/>
+<meta property="og:site_name" content="Townsourced Tech Blog"/>
+
+<meta property="og:url" content="http://tech.townsourced.com/post/embedding-static-files-in-go/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-04-26"/>
+<meta property="article:modified_time" content="2018-04-26"/>
+
+
+
+<meta property="article:tag" content="web development">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="development">
+<meta property="article:tag" content="passwords">
+<meta property="article:tag" content="CI">
+<meta property="article:tag" content="Continuous Integration">
+<meta property="article:tag" content="Lex Library">
+<meta property="article:tag" content="best practices">
+<meta property="article:tag" content="gotchas">
+
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@townsourced">
+<meta name="twitter:title" content="Choosing A Library to Embed Static Assets in Go : tech.townsourced.com">
+<meta name="twitter:creator" content="@shannontimothy">
+<meta name="twitter:description" content="">
+
+<meta name="twitter:domain" content="townsourced.com">
+
+
+
+    <link rel="canonical" href="http://tech.townsourced.com/post/embedding-static-files-in-go/">
+    
+    <link rel="shortcut icon" href="http://tech.townsourced.com/favicon.ico">  
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="http://tech.townsourced.com/css/main.css">
+
+    
+    
+    
+</head> 
+
+
+<body>
+   
+	  
+<header class="header">
+		<div class="container">                       
+				<div class="profile-content pull-left">
+						<h1 class="name">Townsourced Tech Blog</h1>
+						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
+						<ul class="social list-inline">
+								<li><a id="homeLink" href="http://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
+								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
+								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
+								<li class="last-item"><a href="http://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+						</ul> 
+				</div>
+		</div>
+</header>
+    
+
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-md-8 col-sm-12 col-xs-12">
+								<section class="section post">
+                    <div class="section-inner">
+                        <h2 class="heading title">Choosing A Library to Embed Static Assets in Go
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> Thursday, Apr 26, 2018</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 8 min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="http://tech.townsourced.com/post/embedding-static-files-in-go/#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
+                        <div class="content">
+													
+
+<h1 id="background">Background</h1>
+
+<p>One of the oft-touted benefits of Go is that applications written in it are easily deployed because they are
+statically complied.  A lot of this benefit goes away if you need to manage the location and permissions on a bunch of
+files needed to run a web application.</p>
+
+<p>The solution is to compile any necessary files into the application binary itself.  This can be done in Go by using
+a byte slice literal containing the <a href="https://golang.org/ref/spec#String_literals">string representation</a> of the bytes in
+a file.</p>
+
+<pre><code class="language-Go"> fileData := []byte(&quot;\x1f\x8b\ ... \x0f\x00\x00&quot;)
+</code></pre>
+
+<p>The biggest downsides to this approach are:</p>
+
+<ul>
+<li><strong>Larger binaries</strong>
+
+<ul>
+<li>For my current project <a href="https://github.com/lexlibrary/lexlibrary">Lex Library</a> I&rsquo;m seeing a 20 MB executable without embedded
+assets, and a 21 MB executable with them.</li>
+</ul></li>
+<li><strong>Longer compilation</strong>
+
+<ul>
+<li>This is mostly mitigated by the <a href="https://golang.org/doc/go1.10#build">latest caching</a> in the Go compiler.</li>
+</ul></li>
+<li><strong>Increased memory during compilation</strong>
+
+<ul>
+<li>This may bite you if you are developing on low memory devices, but for me personally this hasn&rsquo;t been a concern.</li>
+</ul></li>
+</ul>
+
+<p>You are essentially making a trade-off between development time and operational management time.  If your application&rsquo;s intended
+audience is the general public (or at least the really geeky public that host their own web apps), this trade off is more
+than worthwhile.</p>
+
+<h1 id="embedding-options">Embedding Options</h1>
+
+<p>Perhaps the first library, or at least the first really popular one, to handle embedding static assets in Go applications
+is <a href="https://github.com/jteeuwen/go-bindata">jteeuwen&rsquo;s Go-BinData</a>.  It&rsquo;s a command line application that you pass a
+directory path to and it generates a <code>.go</code> file with your assets embedded in it.</p>
+
+<p>Unfortunately, jteeuwen seems to have dropped off the face of the planet, deleting all of this repositories from github
+as he left.  Luckily for all of us, his code was open-source and so was forked by the community at large. You can find
+several, well-maintained forks of his code on github.  My fork of choice was <a href="https://github.com/shuLhan/go-bindata">shuLhan&rsquo;s</a>,
+but I have since moved onto other options, the reasons for which, I&rsquo;ll get into below.</p>
+
+<p>More details on the jteewen repo are here: <a href="https://github.com/jteeuwen/go-bindata/issues/5">https://github.com/jteeuwen/go-bindata/issues/5</a></p>
+
+<h2 id="alternatives">Alternatives</h2>
+
+<p>Since jteewen&rsquo;s library there have been many, many alternatives.  Below is a <em>non-comprensive</em> list I put together
+while researching this myself:</p>
+
+<ul>
+<li><strong>vfsgen</strong> - <a href="https://github.com/shurcooL/vfsgen">https://github.com/shurcooL/vfsgen</a></li>
+<li><strong>go.rice</strong> - <a href="https://github.com/GeertJohan/go.rice">https://github.com/GeertJohan/go.rice</a></li>
+<li><strong>statik</strong> - <a href="https://github.com/rakyll/statik">https://github.com/rakyll/statik</a></li>
+<li><strong>esc</strong> - <a href="https://github.com/mjibson/esc">https://github.com/mjibson/esc</a></li>
+<li><strong>go-embed</strong> - <a href="https://github.com/pyros2097/go-embed">https://github.com/pyros2097/go-embed</a></li>
+<li><strong>go-resources</strong> - <a href="https://github.com/omeid/go-resources">https://github.com/omeid/go-resources</a></li>
+<li><strong>packr</strong> - <a href="https://github.com/gobuffalo/packr">https://github.com/gobuffalo/packr</a></li>
+<li><strong>statics</strong> - <a href="https://github.com/go-playground/statics">https://github.com/go-playground/statics</a></li>
+<li><strong>templify</strong> - <a href="https://github.com/wlbr/templify">https://github.com/wlbr/templify</a></li>
+<li><strong>gnoso/go-bindata</strong> - <a href="https://github.com/gnoso/go-bindata">https://github.com/gnoso/go-bindata</a></li>
+<li><strong>shuLhan/go-bindata</strong> - <a href="https://github.com/shuLhan/go-bindata">https://github.com/shuLhan/go-bindata</a></li>
+<li><strong>fileb0x</strong> - <a href="https://github.com/UnnoTed/fileb0x">https://github.com/UnnoTed/fileb0x</a></li>
+<li><strong>gobundle</strong> - <a href="https://github.com/alecthomas/gobundle">https://github.com/alecthomas/gobundle</a></li>
+<li><strong>parcello</strong> - <a href="https://github.com/phogolabs/parcello">https://github.com/phogolabs/parcello</a></li>
+</ul>
+
+<p>The main goal of this post is to help you sort through differences and help you determine which features you should consider
+when choosing one of these libraries.</p>
+
+<h1 id="separating-the-wheat-from-the-chaff">Separating the Wheat from the Chaff</h1>
+
+<p>With so many options, it can be overwhelming to determine which library will work best for your purposes. While your
+application may have different requirements than mine, chances are if it&rsquo;s a web application, there will be a lot
+of overlap.  Hopefully this comparison of the libraries below will be useful if you need to make this
+same decision.</p>
+
+<h2 id="criteria">Criteria</h2>
+
+<h3 id="compression">Compression</h3>
+
+<p>As mentioned before, one of the downsides to embedding static files is that it increases the size of the executable.
+You can alleviate some of that by using a library that compresses the files before embedding them.  It is usually worth
+the small cost of decompression to save space as well as less memory usage when compiling.  Also, static web files tend to
+compress really well (other than images), which is why most web browsers support receiving
+gzip compressed files.  This leads directly to my next criterion.</p>
+
+<h3 id="optional-decompression">Optional Decompression</h3>
+
+<p>If your static files are stored in your executable with gzip compression, and you are going to potentially serve up those
+files to your client with gzip compression, why not just send them the already compressed file data?  The ideal library
+would give you the option, at runtime, to retrieve the already compressed file without decompressing it first.</p>
+
+<h3 id="loading-from-the-local-file-system">Loading from the local File System</h3>
+
+<p>When you are developing your web application, anything that adds time or friction between when you <em>make</em> a change and
+when you <em>see</em> a change in your app, should be limited.  If you have to rebuild your statically embedded go file every
+time you make a change to CSS or HTML, you&rsquo;ll quickly be looking for alternatives.</p>
+
+<p>The ideal library should allow you to easily switch between a development build, where the files are loaded locally and
+on-the-fly, and your production build, where the files are fully embedded into executable and ready for distribution.</p>
+
+<h3 id="reproducible-builds">Reproducible Builds</h3>
+
+<p>This criterion took me by surprise, and I didn&rsquo;t consider it originally when I started development on
+<a href="https://github.com/lexlibrary/lexlibrary">Lex Library</a>. As mentioned earlier, my first choice was a <a href="https://github.com/shuLhan/go-bindata">go-bindata fork by
+shuLhan</a>.  I chose it mainly because I was already familiar with the original
+go-bindata library, and this fork looked well maintained.</p>
+
+<p>The library was working great, but, out of the blue, my CI builds started failing.  Like every developer when their tests
+start failing, my first thought was <strong><em>what changed</em></strong>.  I immediately checked my last commit, and tried to figure out how that
+change broke my template handling.  After scratching my head for a while, unable to find a culprit, I re-ran my test
+suite against the last successful build and found that those <em>too</em> were failing.  That told me the change
+had to be environmental, and <em>not</em> in my code.  However, that raised more questions.</p>
+
+<p>I run my Continuous Integration tests in <a href="https://www.docker.com/">Docker containers</a>.  The environments should be
+self-contained, pristine, and reproducible. Somewhere my assumptions about that were wrong.  Stepping through my
+<code>Dockerfile</code>, I found my culprit:</p>
+
+<pre><code class="language-docker">RUN go get -u github.com/shuLhan/go-bindata/...
+</code></pre>
+
+<p>There was a small update to the go-bindata library that broke how I was passing in the path to my static files.  All
+of a sudden my embedded files weren&rsquo;t on the paths I was expecting.  Now, this could be blamed on several factors such
+as the fact that go get always gets the default branch.  In the end, it came down to the simple truth that a process which was
+generating code in my application wasn&rsquo;t being versioned and tracked inside my git repo.  External changes on a dependency
+of mine could break my builds or my tests without me knowing.</p>
+
+<p>One way to fix this issue was to store a copy of the pre-compiled go-bindata executable in my git repo, but:</p>
+
+<ol>
+<li>It&rsquo;s usually not a good idea to store binary blobs in git.</li>
+<li>I&rsquo;d have to manually update it every time there was a bug fix.</li>
+<li>It would make it much harder to build on any other platform other than the one I develop on.</li>
+</ol>
+
+<p>Alternately, I could find a library that <em>didn&rsquo;t</em> require a stand-alone executable, and relied entirely on code that
+is vendored in my git repo. This meant a library that supported <code>go generate</code>, and more specifically, one that didn&rsquo;t
+rely on an external executable to run.</p>
+
+<h3 id="additional-criteria">Additional Criteria</h3>
+
+<p>As I mentioned before, you may have different requirements than I do, so in my comparison table below I included a
+few additional criteria that you may find useful.</p>
+
+<h4 id="config-file">Config File</h4>
+
+<p>If you have a lot of different folders and files to manage, it can be easier to manage them via a config file checked
+into your source control.</p>
+
+<h4 id="http-filesystem-interface">http.FileSystem Interface</h4>
+
+<p>Using a library that satisfies the <a href="https://golang.org/pkg/net/http/#FileSystem">http.FileSystem</a> interface can make it
+much easier to work with the embedded files.</p>
+
+<h4 id="greater-than-200-github-stars">Greater than 200 Github Stars</h4>
+
+<p>While this is a bit arbitrary, and it&rsquo;s not <em>necessarily</em> a measure of quality, a repo&rsquo;s number of stars <em>can</em> be a good
+indicator of an active library, or at least one that&rsquo;s used in a lot of places. This, in turn, <em>could</em> mean that a lot of
+people are battle testing it, and / or submitting bug reports. The library I chose, just <em>barely</em> made it past this
+arbitrary number of stars, so keep that in mind.</p>
+
+<h1 id="comparison">Comparison</h1>
+
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th><a href="#compression">Compression</a></th>
+<th><a href="#optional-decompression">Opt. decompression</a></th>
+<th><a href="#loading-from-the-local-file-system">Local FS</a></th>
+<th><a href="#reproducible-builds">go generate</a></th>
+<th><a href="#reproducible-builds">No EXE</a></th>
+<th><a href="#config-file">(Config File</a></th>
+<th><a href="#http-filesystem-interface">http.FS</a></th>
+<th><a href="#greater-than-200-github-stars">&gt; 200 Stars</a></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><strong><a href="https://github.com/shurcooL/vfsgen">vfsgen</a></strong></td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong>*</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/GeertJohan/go.rice">go.rice</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/rakyll/statik">statik</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/mjibson/esc">esc</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/pyros2097/go-embed">go-embed</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong>*</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/omeid/go-resources">go-resources</a></strong></td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong>*</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/gobuffalo/packr">packr</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/go-playground/statics">statics</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/wlbr/templify">templify</a></strong></td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/gnoso/go-bindata">gnoso/go-bindata</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/shuLhan/go-bindata">shuLhan/go-bindata</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/UnnoTed/fileb0x">fileb0x</a></strong></td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/alecthomas/gobundle">gobundle</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+</tr>
+
+<tr>
+<td><strong><a href="https://github.com/phogolabs/parcello">parcello</a></strong></td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>YES</td>
+<td><strong>YES</strong></td>
+<td>NO</td>
+<td>NO</td>
+<td><strong>YES</strong></td>
+<td><strong>YES</strong></td>
+</tr>
+</tbody>
+</table>
+
+<p>* <em>Additional code required</em></p>
+
+<p>My experience with these libraries vary from writing and deploying applications with them, to simply looking through
+their <code>README</code> and documentation.  If you find any inaccuracies in the table, please let me know in the comments and
+I&rsquo;ll update them.</p>
+
+<h1 id="my-choice">My Choice</h1>
+
+<p>The comparison table makes it pretty clear why I ended up going with <a href="https://github.com/shurcooL/vfsgen">vfsgen</a>, and I
+highly recommend it, especially if you require reproducible builds.  A close runner up was
+<a href="https://github.com/UnnoTed/fileb0x">fileb0x</a>, but unfortunately, it&rsquo;s usage of <code>go generate</code> required a stand-alone
+executable to run.</p>
+
+												</div>
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															
+																<span>
+																	<a href="http://tech.townsourced.com/tags/development">
+																		<a href="http://tech.townsourced.com/categories/development">Development</a>
+																	</a>
+																</span>
+															
+													</span>
+
+													<ul class="list-inline tags text-right">
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/go">
+																	<span class="label label-theme">#Go</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/web-development">
+																	<span class="label label-theme">#Web Development</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/reference">
+																	<span class="label label-theme">#reference</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/continuous-integration">
+																	<span class="label label-theme">#Continuous Integration</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="http://tech.townsourced.com/tags/lex-library">
+																	<span class="label label-theme">#Lex Library</span>
+																</a>
+															</li>
+														
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "techtownsourcedcom" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+												</div>
+                    </div>                 
+									</section>
+                
+            </div>
+						<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div>  
+				</div>                 
+		</aside>
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						
+							<li>
+								<a href="http://tech.townsourced.com/categories/development">development</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/categories/releases">releases</a>
+							</li>
+						
+					</ul>
+					<hr>
+					<ul class="list-inline tags">
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/authentication">
+									<span class="label label-theme">#authentication</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/continuous-integration">
+									<span class="label label-theme">#continuous-integration</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/go">
+									<span class="label label-theme">#go</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/lex-library">
+									<span class="label label-theme">#lex-library</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/reference">
+									<span class="label label-theme">#reference</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/townsourced">
+									<span class="label label-theme">#townsourced</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/tutorial">
+									<span class="label label-theme">#tutorial</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="http://tech.townsourced.com/tags/web-development">
+									<span class="label label-theme">#web-development</span>
+								</a>
+							</li>
+						
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="https://github.com/lexlibrary/lexlibrary" target="_blank"><i class="fa fa-external-link"></i>Lex Library</a></h3>
+										<p class="description">
+											An open source documentation repository with modern features, like importing from a wide variety of documentation files and web sites, and natural language processing.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="https://www.townsourced.com" target="_blank"><i class="fa fa-external-link"></i>Townsourced</a></h3>
+										<p class="description">
+											A locally moderated community bulletin board, built to help communities discover events, share, shop and sell locally.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on BoltDB.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div>  
+				</div>                 
+		</aside>
+</div>
+
+					</div>
+    </div>
+	 
+<footer class="footer">
+		<div class="container text-center">
+						<small class="copyright">
+							<div>© <a href="https://solutions.townsourced.com" target="_blank">Townsourced</a>  - design modified from template by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a></div>
+							<div>
+						Unless otherwise noted, content is released under a  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</div>
+						</small>
+		</div>
+</footer>
+
+<script type="text/javascript" src="http://tech.townsourced.com/js/prism.js"></script>            
+
+
+<script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
+
+
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    _paq.push(['setTrackerUrl',  'https://api-e68fcf7f9c66665c7e009b9f533bdf6f.townsourced.com']);
+    _paq.push(['setSiteId', 2]);
+    _paq.push(['setApiToken', 'E80SMnaO8kFL-gyxQRvLEUTUOCv6zi3R63VALxf64ft']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://5plhgbtl6we7tvxqeqt1.townsourced.com/embed.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+
+
+
+    
+
+	<script type="text/javascript">
+		
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
+</body>
+</html> 
