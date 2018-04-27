@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Continuous Integration on Townsourced Tech Blog</title>
+    <link>http://tech.townsourced.com/tags/continuous-integration/</link>
+    <description>Recent content in Continuous Integration on Townsourced Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
+    <lastBuildDate>Thu, 26 Apr 2018 20:58:55 -0500</lastBuildDate>
+    
+	<atom:link href="http://tech.townsourced.com/tags/continuous-integration/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Choosing A Library to Embed Static Assets in Go</title>
+      <link>http://tech.townsourced.com/post/embedding-static-files-in-go/</link>
+      <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
+      
+      <guid>http://tech.townsourced.com/post/embedding-static-files-in-go/</guid>
+      <description>Background One of the oft-touted benefits of Go is that applications written in it are easily deployed because they are statically complied. A lot of this benefit goes away if you need to manage the location and permissions on a bunch of files needed to run a web application.
+The solution is to compile any necessary files into the application binary itself. This can be done in Go by using a byte slice literal containing the string representation of the bytes in a file.</description>
+    </item>
+    
+  </channel>
+</rss>
