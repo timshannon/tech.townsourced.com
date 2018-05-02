@@ -169,7 +169,7 @@ arbitrary number of stars, so keep that in mind.
 
 # Comparison 
 
-| Library | [Compression](#compression)	| [Opt. decompression](#optional-decompression)	| [Local FS](#loading-from-the-local-file-system) | [go generate](#reproducible-builds) | [No EXE](#reproducible-builds) | [(Config File](#config-file)	| [http.FS](#http-filesystem-interface)	| [> 200 Stars](#greater-than-200-github-stars)	|
+| Library | [Compression](#compression)	| [Opt. decompression](#optional-decompression)	| [Local FS](#loading-from-the-local-file-system) | [go generate](#reproducible-builds) | [No EXE](#reproducible-builds) | [Config File](#config-file)	| [http.FS](#http-filesystem-interface)	| [> 200 Stars](#greater-than-200-github-stars)	|
 | -----------------------------------------------------		| ------------- | -------------	| ------------- | ------------- | -------------	| -------------	| ------------- | -------------	|
 | **[vfsgen](https://github.com/shurcooL/vfsgen)**  		| **YES**	| **YES** 	| **YES**\*	| **YES**	| **YES**	| NO		| **YES**	| **YES**	|
 | **[go.rice](https://github.com/GeertJohan/go.rice)** 		| **YES**	| NO	 	| **YES**	| NO		| NO		| NO		| **YES**	| **YES**	|
