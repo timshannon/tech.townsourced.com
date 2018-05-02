@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Townsourced Tech Blog</title>
-    <link>http://tech.townsourced.com/categories/</link>
+    <link>https://tech.townsourced.com/categories/</link>
     <description>Recent content in Categories on Townsourced Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     
-	<atom:link href="http://tech.townsourced.com/categories/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tech.townsourced.com/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Development</title>
-      <link>http://tech.townsourced.com/categories/development/</link>
+      <link>https://tech.townsourced.com/categories/development/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/categories/development/</guid>
+      <guid>https://tech.townsourced.com/categories/development/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Releases</title>
-      <link>http://tech.townsourced.com/categories/releases/</link>
+      <link>https://tech.townsourced.com/categories/releases/</link>
       <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>
       
-      <guid>http://tech.townsourced.com/categories/releases/</guid>
+      <guid>https://tech.townsourced.com/categories/releases/</guid>
       <description></description>
     </item>
     

@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Authentication on Townsourced Tech Blog</title>
-    <link>http://tech.townsourced.com/tags/authentication/</link>
+    <link>https://tech.townsourced.com/tags/authentication/</link>
     <description>Recent content in Authentication on Townsourced Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sun, 15 Jan 2017 19:05:51 -0600</lastBuildDate>
     
-	<atom:link href="http://tech.townsourced.com/tags/authentication/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tech.townsourced.com/tags/authentication/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Anatomy of a Go Web App - Part 2: Authentication</title>
-      <link>http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</link>
+      <link>https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</link>
       <pubDate>Sun, 15 Jan 2017 19:05:51 -0600</pubDate>
       
-      <guid>http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</guid>
+      <guid>https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</guid>
       <description>&lt;p&gt;This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for
-&lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.  The first part is &lt;a href=&#34;http://tech.townsourced.com/post/anatomy-of-a-go-web-app/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.  The first part is &lt;a href=&#34;https://tech.townsourced.com/post/anatomy-of-a-go-web-app/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Instead of a general overview, like part one, this post will focus specifically on &lt;strong&gt;User Authentication&lt;/strong&gt;, i.e. how to
 handle passwords (if at all) and session management.&lt;/p&gt;
