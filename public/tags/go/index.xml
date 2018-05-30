@@ -2,44 +2,44 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Go on Townsourced Tech Blog</title>
-    <link>http://tech.townsourced.com/tags/go/</link>
+    <link>https://tech.townsourced.com/tags/go/</link>
     <description>Recent content in Go on Townsourced Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Thu, 26 Apr 2018 20:58:55 -0500</lastBuildDate>
     
-	<atom:link href="http://tech.townsourced.com/tags/go/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tech.townsourced.com/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Choosing A Library to Embed Static Assets in Go</title>
-      <link>http://tech.townsourced.com/post/embedding-static-files-in-go/</link>
+      <link>https://tech.townsourced.com/post/embedding-static-files-in-go/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/post/embedding-static-files-in-go/</guid>
+      <guid>https://tech.townsourced.com/post/embedding-static-files-in-go/</guid>
       <description>Background One of the oft-touted benefits of Go is that applications written in it are easily deployed because they are statically complied. A lot of this benefit goes away if you need to manage the location and permissions on a bunch of files needed to run a web application.
 The solution is to compile any necessary files into the application binary itself. This can be done in Go by using a byte slice literal containing the string representation of the bytes in a file.</description>
     </item>
     
     <item>
       <title>Townsourced Open-sourced</title>
-      <link>http://tech.townsourced.com/post/townsourced-open-sourced/</link>
+      <link>https://tech.townsourced.com/post/townsourced-open-sourced/</link>
       <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>
       
-      <guid>http://tech.townsourced.com/post/townsourced-open-sourced/</guid>
+      <guid>https://tech.townsourced.com/post/townsourced-open-sourced/</guid>
       <description>TLDR: Grab the code here: https://github.com/timshannon/townsourced and run docker-compose up
 My goal with Townsourced was first and foremost to build something useful for local, small communities. I felt local communities were very under-represented online, and the social networks available catered either to large communities or niche communities of shared interest. My target audience was small, local communities: small towns, college campuses, neighborhoods, churches, schools. I wanted to build something that handled the overlap between those local communities better than existing options.</description>
     </item>
     
     <item>
       <title>Anatomy of a Go Web App - Part 2: Authentication</title>
-      <link>http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</link>
+      <link>https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</link>
       <pubDate>Sun, 15 Jan 2017 19:05:51 -0600</pubDate>
       
-      <guid>http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</guid>
+      <guid>https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/</guid>
       <description>&lt;p&gt;This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for
-&lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.  The first part is &lt;a href=&#34;http://tech.townsourced.com/post/anatomy-of-a-go-web-app/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;a href=&#34;https://www.townsourced.com&#34;&gt;townsourced&lt;/a&gt;.  The first part is &lt;a href=&#34;https://tech.townsourced.com/post/anatomy-of-a-go-web-app/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Instead of a general overview, like part one, this post will focus specifically on &lt;strong&gt;User Authentication&lt;/strong&gt;, i.e. how to
 handle passwords (if at all) and session management.&lt;/p&gt;
@@ -49,10 +49,10 @@ handle passwords (if at all) and session management.&lt;/p&gt;
     
     <item>
       <title>Anatomy of a Go Web Application</title>
-      <link>http://tech.townsourced.com/post/anatomy-of-a-go-web-app/</link>
+      <link>https://tech.townsourced.com/post/anatomy-of-a-go-web-app/</link>
       <pubDate>Sun, 04 Dec 2016 10:37:07 -0600</pubDate>
       
-      <guid>http://tech.townsourced.com/post/anatomy-of-a-go-web-app/</guid>
+      <guid>https://tech.townsourced.com/post/anatomy-of-a-go-web-app/</guid>
       <description>&lt;p&gt;When building a web application from scratch, there are a lot of decisions to make.  The goal of this guide is to give
 one more example of how you can go about building a web application in the Go language, as well as to give you an idea
 what things you need to start thinking about and plan for before you get started.&lt;/p&gt;
