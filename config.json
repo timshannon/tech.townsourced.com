@@ -6,7 +6,7 @@
 		"category": "categories",
 		"tag": "tags"
 	},
-	"baseurl": "http://tech.townsourced.com",
+	"baseurl": "https://tech.townsourced.com",
 	"title": "Townsourced Tech Blog",
 	"canonifyurls": true,
 	"languageCode": "en-us",
