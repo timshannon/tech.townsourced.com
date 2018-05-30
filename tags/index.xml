@@ -2,85 +2,85 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Townsourced Tech Blog</title>
-    <link>http://tech.townsourced.com/tags/</link>
+    <link>https://tech.townsourced.com/tags/</link>
     <description>Recent content in Tags on Townsourced Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
     <lastBuildDate>Sun, 15 Jan 2017 19:05:51 -0600</lastBuildDate>
     
-	<atom:link href="http://tech.townsourced.com/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tech.townsourced.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Authentication</title>
-      <link>http://tech.townsourced.com/tags/authentication/</link>
+      <link>https://tech.townsourced.com/tags/authentication/</link>
       <pubDate>Sun, 15 Jan 2017 19:05:51 -0600</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/authentication/</guid>
+      <guid>https://tech.townsourced.com/tags/authentication/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Continuous Integration</title>
-      <link>http://tech.townsourced.com/tags/continuous-integration/</link>
+      <link>https://tech.townsourced.com/tags/continuous-integration/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/continuous-integration/</guid>
+      <guid>https://tech.townsourced.com/tags/continuous-integration/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Go</title>
-      <link>http://tech.townsourced.com/tags/go/</link>
+      <link>https://tech.townsourced.com/tags/go/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/go/</guid>
+      <guid>https://tech.townsourced.com/tags/go/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Lex Library</title>
-      <link>http://tech.townsourced.com/tags/lex-library/</link>
+      <link>https://tech.townsourced.com/tags/lex-library/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/lex-library/</guid>
+      <guid>https://tech.townsourced.com/tags/lex-library/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Reference</title>
-      <link>http://tech.townsourced.com/tags/reference/</link>
+      <link>https://tech.townsourced.com/tags/reference/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/reference/</guid>
+      <guid>https://tech.townsourced.com/tags/reference/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Townsourced</title>
-      <link>http://tech.townsourced.com/tags/townsourced/</link>
+      <link>https://tech.townsourced.com/tags/townsourced/</link>
       <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/townsourced/</guid>
+      <guid>https://tech.townsourced.com/tags/townsourced/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Tutorial</title>
-      <link>http://tech.townsourced.com/tags/tutorial/</link>
+      <link>https://tech.townsourced.com/tags/tutorial/</link>
       <pubDate>Sun, 15 Jan 2017 19:05:51 -0600</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/tutorial/</guid>
+      <guid>https://tech.townsourced.com/tags/tutorial/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Web Development</title>
-      <link>http://tech.townsourced.com/tags/web-development/</link>
+      <link>https://tech.townsourced.com/tags/web-development/</link>
       <pubDate>Thu, 26 Apr 2018 20:58:55 -0500</pubDate>
       
-      <guid>http://tech.townsourced.com/tags/web-development/</guid>
+      <guid>https://tech.townsourced.com/tags/web-development/</guid>
       <description></description>
     </item>
     

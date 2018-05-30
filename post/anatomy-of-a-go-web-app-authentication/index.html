@@ -22,7 +22,7 @@
 <meta property="og:title" content="Anatomy of a Go Web App - Part 2: Authentication : tech.townsourced.com"/>
 <meta property="og:site_name" content="Townsourced Tech Blog"/>
 
-<meta property="og:url" content="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">
+<meta property="og:url" content="https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2017-01-15"/>
 <meta property="article:modified_time" content="2017-01-15"/>
@@ -53,16 +53,16 @@
 
 
 
-    <link rel="canonical" href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">
+    <link rel="canonical" href="https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/">
     
-    <link rel="shortcut icon" href="http://tech.townsourced.com/favicon.ico">  
+    <link rel="shortcut icon" href="https://tech.townsourced.com/favicon.ico">  
     <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 
     
-    <link rel="stylesheet" href="http://tech.townsourced.com/css/bootstrap.min.css">   
-    <link rel="stylesheet" href="http://tech.townsourced.com/css/font-awesome.min.css">
-    <link rel="stylesheet" href="http://tech.townsourced.com/css/prism.css">
-    <link rel="stylesheet" href="http://tech.townsourced.com/css/main.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/main.css">
 
     
     
@@ -79,11 +79,11 @@
 						<h1 class="name">Townsourced Tech Blog</h1>
 						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
 						<ul class="social list-inline">
-								<li><a id="homeLink" href="http://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a id="homeLink" href="https://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
 								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
 								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
 								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
-								<li class="last-item"><a href="http://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+								<li class="last-item"><a href="https://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
 						</ul> 
 				</div>
 		</div>
@@ -103,14 +103,14 @@
 															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
 															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 11 min</li>
 															<li class="comments"><i class="fa fa-comments"></i>
-																<a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/#disqus_thread">0 comments</a>
+																<a href="https://tech.townsourced.com/post/anatomy-of-a-go-web-app-authentication/#disqus_thread">0 comments</a>
 															</li>
 														</ul>
 													</div>
 												</h2>
                         <div class="content">
 													<p>This is part two of a set of posts breaking down some of the decisions I made when putting together the web server for
-<a href="https://www.townsourced.com">townsourced</a>.  The first part is <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/">here</a>.</p>
+<a href="https://www.townsourced.com">townsourced</a>.  The first part is <a href="https://tech.townsourced.com/post/anatomy-of-a-go-web-app/">here</a>.</p>
 
 <p>Instead of a general overview, like part one, this post will focus specifically on <strong>User Authentication</strong>, i.e. how to
 handle passwords (if at all) and session management.</p>
@@ -143,14 +143,14 @@ This means adding OAUTH support for one or more of the <strong>Big Three</strong
 you through the pieces you need to have in place in order to get it working.  A very high level overview of OAUTH looks
 like this (courtesy of Google):</p>
 
-<p><img src="http://tech.townsourced.com/images/post/anatomy-of-a-go-web-app-authentication/server_side_code_flow.png" alt="OAUTH2 Server Side Flow" title="Server Side Code Flow" /></p>
+<p><img src="https://tech.townsourced.com/images/post/anatomy-of-a-go-web-app-authentication/server_side_code_flow.png" alt="OAUTH2 Server Side Flow" title="Server Side Code Flow" /></p>
 
 <p>Facebook and Google are very similar, and you should be able to get by with a standard
 <a href="https://github.com/golang/oauth2">OAUTH2 library</a> (with a little bit of tweaking).  Twitter, on the other hand, actually
 uses <em>OAUTH1.0A</em>, so you&rsquo;ll need to make sure you use a library built for it like
 <a href="https://github.com/mrjones/oauth">https://github.com/mrjones/oauth</a>.</p>
 
-<p>Each of the <strong>Big Three</strong> have a unique user identifier that you can store with your <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package">user record</a>.</p>
+<p>Each of the <strong>Big Three</strong> have a unique user identifier that you can store with your <a href="https://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package">user record</a>.</p>
 
 <pre><code class="language-Go">package app
 
@@ -234,7 +234,7 @@ setting my password requirements.</p>
 <li>Password should not be on the top 1,000 (or more) most common passwords list
 
 <ul>
-<li>Load a text file during the <code>Init()</code> of your <a href="http://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package">app layer</a> and
+<li>Load a text file during the <code>Init()</code> of your <a href="https://tech.townsourced.com/post/anatomy-of-a-go-web-app/#the-app-package">app layer</a> and
 test new passwords against it.</li>
 <li>Update the password file yearly. A good source I&rsquo;ve found is <a href="https://github.com/robsheldon/bad-passwords-index">here</a>.</li>
 </ul></li>
@@ -563,8 +563,8 @@ or shoot me a message.</p>
 													<span class="pull-left">Posted under: 
 															
 																<span>
-																	<a href="http://tech.townsourced.com/tags/development">
-																		<a href="http://tech.townsourced.com/categories/development">Development</a>
+																	<a href="https://tech.townsourced.com/tags/development">
+																		<a href="https://tech.townsourced.com/categories/development">Development</a>
 																	</a>
 																</span>
 															
@@ -573,37 +573,37 @@ or shoot me a message.</p>
 													<ul class="list-inline tags text-right">
 														
 															<li>
-																<a href="http://tech.townsourced.com/tags/go">
+																<a href="https://tech.townsourced.com/tags/go">
 																	<span class="label label-theme">#Go</span>
 																</a>
 															</li>
 														
 															<li>
-																<a href="http://tech.townsourced.com/tags/web-development">
+																<a href="https://tech.townsourced.com/tags/web-development">
 																	<span class="label label-theme">#Web Development</span>
 																</a>
 															</li>
 														
 															<li>
-																<a href="http://tech.townsourced.com/tags/tutorial">
+																<a href="https://tech.townsourced.com/tags/tutorial">
 																	<span class="label label-theme">#tutorial</span>
 																</a>
 															</li>
 														
 															<li>
-																<a href="http://tech.townsourced.com/tags/reference">
+																<a href="https://tech.townsourced.com/tags/reference">
 																	<span class="label label-theme">#reference</span>
 																</a>
 															</li>
 														
 															<li>
-																<a href="http://tech.townsourced.com/tags/authentication">
+																<a href="https://tech.townsourced.com/tags/authentication">
 																	<span class="label label-theme">#authentication</span>
 																</a>
 															</li>
 														
 															<li>
-																<a href="http://tech.townsourced.com/tags/townsourced">
+																<a href="https://tech.townsourced.com/tags/townsourced">
 																	<span class="label label-theme">#Townsourced</span>
 																</a>
 															</li>
@@ -659,11 +659,11 @@ or shoot me a message.</p>
 					<ul class="list-unstyled">
 						
 							<li>
-								<a href="http://tech.townsourced.com/categories/development">development</a>
+								<a href="https://tech.townsourced.com/categories/development">development</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/categories/releases">releases</a>
+								<a href="https://tech.townsourced.com/categories/releases">releases</a>
 							</li>
 						
 					</ul>
@@ -671,49 +671,49 @@ or shoot me a message.</p>
 					<ul class="list-inline tags">
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/authentication">
+								<a href="https://tech.townsourced.com/tags/authentication">
 									<span class="label label-theme">#authentication</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/continuous-integration">
+								<a href="https://tech.townsourced.com/tags/continuous-integration">
 									<span class="label label-theme">#continuous-integration</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/go">
+								<a href="https://tech.townsourced.com/tags/go">
 									<span class="label label-theme">#go</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/lex-library">
+								<a href="https://tech.townsourced.com/tags/lex-library">
 									<span class="label label-theme">#lex-library</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/reference">
+								<a href="https://tech.townsourced.com/tags/reference">
 									<span class="label label-theme">#reference</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/townsourced">
+								<a href="https://tech.townsourced.com/tags/townsourced">
 									<span class="label label-theme">#townsourced</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/tutorial">
+								<a href="https://tech.townsourced.com/tags/tutorial">
 									<span class="label label-theme">#tutorial</span>
 								</a>
 							</li>
 						
 							<li>
-								<a href="http://tech.townsourced.com/tags/web-development">
+								<a href="https://tech.townsourced.com/tags/web-development">
 									<span class="label label-theme">#web-development</span>
 								</a>
 							</li>
@@ -788,7 +788,7 @@ or shoot me a message.</p>
 		</div>
 </footer>
 
-<script type="text/javascript" src="http://tech.townsourced.com/js/prism.js"></script>            
+<script type="text/javascript" src="https://tech.townsourced.com/js/prism.js"></script>            
 
 
 <script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
