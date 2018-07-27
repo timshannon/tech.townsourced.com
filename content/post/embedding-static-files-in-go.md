@@ -15,7 +15,6 @@ keywords:
   - go
   - golang
   - development
-  - passwords
   - CI
   - Continuous Integration
   - Lex Library
@@ -23,7 +22,6 @@ keywords:
   - gotchas
 ---
 
-# Background
 One of the oft-touted benefits of Go is that applications written in it are easily deployed because they are 
 statically complied.  A lot of this benefit goes away if you need to manage the location and permissions on a bunch of
 files needed to run a web application.
