@@ -19,7 +19,7 @@ keywords:
   - programming
 ---
 
-# Like Cavemen Grunting and Pointing at Cave Paintings
+# Like Neanderthals Grunting and Pointing at Cave Paintings
 The other day a junior dev walked up to my desk and ask for some help troubleshooting a deadlocking issue he was seeing.
 I wasn't familiar with the details of his process, so he proceeded to explain to me how the data was modeled, and how it
 flowed from one process to the next and was modified along the way.
@@ -50,7 +50,7 @@ my current working set of ideas, there was nothing left but chaos.  And most sur
 or character anywhere***.
 
 # Shared Context
-I thought back to the fervent back and forth of our discussion.  How did we manage to communicate complicated ideas 
+I thought of the fervent back and forth of our discussion.  How did we manage to communicate complicated ideas 
 so effectively?  Our first attempt without the whiteboard was a failure, but somehow adding the whiteboard into the 
 discussion completely facilitated effective communication.  Not only that, but we did it without having to *name* any of 
 the myriad, individual parts of the process.  There were no "DataProcessFactory Factories" or "AbstractManagerImpl".  
@@ -76,7 +76,7 @@ given you all of their requirements yet.
 Naming things is hard.
 
 # Shrink Your Context
-When I had stepped away from that whiteboard I had *lost the context of the problem*.  It was at that point the scribbles
+When I stepped away from that whiteboard I *lost the context of the problem*.  It was at that point the scribbles
 and smudges of my diagram changed from a **Glorious Diagram of Identifiers and Logic** to an unintelligible mess.  It 
 turns out that a misshapen square isn't a good substitute for a proper name.  With that in mind, you need to expect that
 anyone looking at your code is coming at it with *no* context.
@@ -86,5 +86,5 @@ variable name than `StudentRecordIndex`?  When `i` lives and dies in the handful
 can quickly forget what `i` means because it's no longer relevant to the rest of the code.
 
 If you keep your functions / methods / classes small and focused on doing a specific thing, your variables will name
-themselves, and you can sometimes get away with the development equivalent of pointing and grunting by naming your 
-variables with a single letter.
+themselves. You can then get away with naming your variables with a single letter; the development equivalent of pointing 
+and grunting.
