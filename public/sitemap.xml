@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://tech.townsourced.com/post/when-naming-is-important-and-when-its-not/</loc>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://tech.townsourced.com/post/embedding-static-files-in-go/</loc>
     <lastmod>2018-04-26T20:58:55-05:00</lastmod>
   </url>
@@ -41,7 +46,13 @@
   
   <url>
     <loc>https://tech.townsourced.com/categories/development/</loc>
-    <lastmod>2018-04-26T20:58:55-05:00</lastmod>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://tech.townsourced.com/tags/development/</loc>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -59,7 +70,13 @@
   
   <url>
     <loc>https://tech.townsourced.com/post/</loc>
-    <lastmod>2018-04-26T20:58:55-05:00</lastmod>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://tech.townsourced.com/tags/programming/</loc>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -72,6 +89,12 @@
   <url>
     <loc>https://tech.townsourced.com/categories/releases/</loc>
     <lastmod>2017-11-28T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://tech.townsourced.com/tags/standards/</loc>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -89,7 +112,7 @@
   
   <url>
     <loc>https://tech.townsourced.com/</loc>
-    <lastmod>2018-04-26T20:58:55-05:00</lastmod>
+    <lastmod>2018-07-30T09:17:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

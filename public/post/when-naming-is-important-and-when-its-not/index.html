@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+  
+  
+ <html lang="en">   
+<head>
+
+    <title>When Naming Is Important, and When It&#39;s Not</title>
+
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
+
+<meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,go, golang, development, best practices, gotchas, naming, naming standards, programming, ">
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content=""/>
+<meta property="og:title" content="When Naming Is Important, and When It&#39;s Not : tech.townsourced.com"/>
+<meta property="og:site_name" content="Townsourced Tech Blog"/>
+
+<meta property="og:url" content="https://tech.townsourced.com/post/when-naming-is-important-and-when-its-not/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-07-30"/>
+<meta property="article:modified_time" content="2018-07-30"/>
+
+
+
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="development">
+<meta property="article:tag" content="best practices">
+<meta property="article:tag" content="gotchas">
+<meta property="article:tag" content="naming">
+<meta property="article:tag" content="naming standards">
+<meta property="article:tag" content="programming">
+
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@townsourced">
+<meta name="twitter:title" content="When Naming Is Important, and When It&#39;s Not : tech.townsourced.com">
+<meta name="twitter:creator" content="@shannontimothy">
+<meta name="twitter:description" content="">
+
+<meta name="twitter:domain" content="townsourced.com">
+
+
+
+    <link rel="canonical" href="https://tech.townsourced.com/post/when-naming-is-important-and-when-its-not/">
+    
+    <link rel="shortcut icon" href="https://tech.townsourced.com/favicon.ico">  
+    <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/main.css">
+
+    
+    
+    
+</head> 
+
+
+<body>
+   
+	  
+<header class="header">
+		<div class="container">                       
+				<div class="profile-content pull-left">
+						<h1 class="name">Townsourced Tech Blog</h1>
+						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
+						<ul class="social list-inline">
+								<li><a id="homeLink" href="https://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
+								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
+								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
+								<li class="last-item"><a href="https://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+						</ul> 
+				</div>
+		</div>
+</header>
+    
+
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-md-8 col-sm-12 col-xs-12">
+								<section class="section post">
+                    <div class="section-inner">
+                        <h2 class="heading title">When Naming Is Important, and When It&#39;s Not
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> Monday, Jul 30, 2018</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 5 min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="https://tech.townsourced.com/post/when-naming-is-important-and-when-its-not/#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
+                        <div class="content">
+													
+
+<h1 id="like-cavemen-grunting-and-pointing-at-cave-paintings">Like Cavemen Grunting and Pointing at Cave Paintings</h1>
+
+<p>The other day a junior dev walked up to my desk and ask for some help troubleshooting a deadlocking issue he was seeing.
+I wasn&rsquo;t familiar with the details of his process, so he proceeded to explain to me how the data was modeled, and how it
+flowed from one process to the next and was modified along the way.</p>
+
+<p>The process was complicated enough that I wasn&rsquo;t able to build a clear picture of the process in my head.  I found I was
+beginning to misunderstand some of the nuances of the process while he was explaining it.  After a bit, when we both
+realized we weren&rsquo;t on the same page yet, we decided to quick sketch out the process on a whiteboard.</p>
+
+<p>Now, I&rsquo;m not the most artistic individual.  In fact, even saying that I&rsquo;m &ldquo;not artistic&rdquo; is being <em>so</em> generous as to be
+absurd.  In truth, I couldn&rsquo;t draw a straight line to save life, and even when I&rsquo;m writing notes down on paper (instead
+of on a keyboard), I find myself getting impatient with the speed at which I can get ideas down, and frustrated with
+the fact that I can barely read what I&rsquo;ve just written.</p>
+
+<p>All of this goes to the point that when I whiteboard something it&rsquo;s more than a bit of a mess.  It&rsquo;s a collection of
+wild lines connecting oblong circles, and lopsided squares with random chicken scratches scattered all over that could
+be anything from abbreviations to Entity-Relationship markings. Or maybe it was just where I accidentally leaned on the
+board for a minute.</p>
+
+<p>Despite all of my dexterous inadequacies, I usually manage to get my ideas across, especially if I force myself to slow
+down and be patient when whiteboarding an idea.  This <em>wasn&rsquo;t</em> one of those times.</p>
+
+<p>I ended up being able to help him out, and we planned out a better way to model some of the data in his process so that
+it would perform better concurrently.  After he left, I went over to clean up the whiteboard.  I was expecting the mess
+of a quickly sketched out idea, but what was left on the board could only be described as <em>&ldquo;abstract&rdquo;</em>.   There where
+random lines darting back and forth from one shape to the next.  There seemed to be no order or reason to any of the
+&ldquo;shapes&rdquo; on the board.  Once I had stepped away from the problem, and had let the <em>context of the problem</em> drop out of
+my current working set of ideas, there was nothing left but chaos.  And most surprisingly, <strong><em>there wasn&rsquo;t a single word
+or character anywhere</em></strong>.</p>
+
+<h1 id="shared-context">Shared Context</h1>
+
+<p>I thought back to the fervent back and forth of our discussion.  How did we manage to communicate complicated ideas
+so effectively?  Our first attempt without the whiteboard was a failure, but somehow adding the whiteboard into the
+discussion completely facilitated effective communication.  Not only that, but we did it without having to <em>name</em> any of
+the myriad, individual parts of the process.  There were no &ldquo;DataProcessFactory Factories&rdquo; or &ldquo;AbstractManagerImpl&rdquo;.</p>
+
+<p>The whiteboard, even though messy and disorganized, provided <em>shared context</em>.  When I referred to the piece of code
+that distributed data to several child processes, I drew a square (or at least a roughly square-like object).  From that
+moment on, that square(ish) shape encapsulated the idea of that process.  Every time I, or the junior dev, needed to refer
+to that process we simply pointed (and grunted).  It didn&rsquo;t need a name, because we shared a <strong>Contextual and Agreed Upon
+Plane of Definitions</strong> or <strong>CAUPD</strong>.  On second thought, that name sucks.  We&rsquo;ll just call it shared context.</p>
+
+<h1 id="naming-things-is-hard">Naming Things is Hard</h1>
+
+<p>So how does this apply to programming?  What great insight did this this all lead me to, and how did it make me a better
+developer?  Well it didn&rsquo;t really.  I&rsquo;m not doing anything different today that I wasn&rsquo;t already doing.  However, it has
+given me a better understanding as to the <em>why</em> of some naming and programming standards that I keep seeing being brought
+up again and again when best practices are being discussed.</p>
+
+<p>Names are a way to share context.  Either with another developer, or with your idiot self in six months when you&rsquo;ve
+forgotten how any of your code works.  The name needs to carry along the entire concept of what that code is doing.  Oh,
+and it can&rsquo;t be too long because no one likes long names.  And you need to come up with the name on the spot while writing
+your code, and all while you might not know entirely everything that the code will need to do because the client hasn&rsquo;t
+given you all of their requirements yet.</p>
+
+<p>Naming things is hard.</p>
+
+<h1 id="shrink-your-context">Shrink Your Context</h1>
+
+<p>When I had stepped away from that whiteboard I had <em>lost the context of the problem</em>.  It was at that point the scribbles
+and smudges of my diagram changed from a <strong>Glorious Diagram of Identifiers and Logic</strong> to an unintelligible mess.  It
+turns out that a misshapen square isn&rsquo;t a good substitute for a proper name.  With that in mind, you need to expect that
+anyone looking at your code is coming at it with <em>no</em> context.</p>
+
+<p>The best way to help someone understand your context is to make that context as small as possible.  When is <code>i</code> a better
+variable name than <code>StudentRecordIndex</code>?  When <code>i</code> lives and dies in the handful of lines before and after it. When they
+can quickly forget what <code>i</code> means because it&rsquo;s no longer relevant to the rest of the code.</p>
+
+<p>If you keep your functions / methods / classes small and focused on doing a specific thing, your variables will name
+themselves, and you can sometimes get away with the development equivalent of pointing and grunting by naming your
+variables with a single letter.</p>
+
+												</div>
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															
+																<span>
+																	<a href="https://tech.townsourced.com/tags/development">
+																		<a href="https://tech.townsourced.com/categories/development">Development</a>
+																	</a>
+																</span>
+															
+													</span>
+
+													<ul class="list-inline tags text-right">
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/development">
+																	<span class="label label-theme">#Development</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/standards">
+																	<span class="label label-theme">#Standards</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/programming">
+																	<span class="label label-theme">#Programming</span>
+																</a>
+															</li>
+														
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "techtownsourcedcom" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+												</div>
+                    </div>                 
+									</section>
+                
+            </div>
+						<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div>  
+				</div>                 
+		</aside>
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						
+							<li>
+								<a href="https://tech.townsourced.com/categories/development">development</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/categories/releases">releases</a>
+							</li>
+						
+					</ul>
+					<hr>
+					<ul class="list-inline tags">
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/authentication">
+									<span class="label label-theme">#authentication</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/continuous-integration">
+									<span class="label label-theme">#continuous-integration</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/development">
+									<span class="label label-theme">#development</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/go">
+									<span class="label label-theme">#go</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/lex-library">
+									<span class="label label-theme">#lex-library</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/programming">
+									<span class="label label-theme">#programming</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/reference">
+									<span class="label label-theme">#reference</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/standards">
+									<span class="label label-theme">#standards</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/townsourced">
+									<span class="label label-theme">#townsourced</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/tutorial">
+									<span class="label label-theme">#tutorial</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/web-development">
+									<span class="label label-theme">#web-development</span>
+								</a>
+							</li>
+						
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="https://github.com/lexlibrary/lexlibrary" target="_blank"><i class="fa fa-external-link"></i>Lex Library</a></h3>
+										<p class="description">
+											An open source documentation repository with modern features, like importing from a wide variety of documentation files and web sites, and natural language processing.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="https://www.townsourced.com" target="_blank"><i class="fa fa-external-link"></i>Townsourced</a></h3>
+										<p class="description">
+											A locally moderated community bulletin board, built to help communities discover events, share, shop and sell locally.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on BoltDB.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div>  
+				</div>                 
+		</aside>
+</div>
+
+					</div>
+    </div>
+	 
+<footer class="footer">
+		<div class="container text-center">
+						<small class="copyright">
+							<div>© <a href="https://solutions.townsourced.com" target="_blank">Townsourced</a>  - design modified from template by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a></div>
+							<div>
+						Unless otherwise noted, content is released under a  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</div>
+						</small>
+		</div>
+</footer>
+
+<script type="text/javascript" src="https://tech.townsourced.com/js/prism.js"></script>            
+
+
+<script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
+
+
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    _paq.push(['setTrackerUrl',  'https://api-e68fcf7f9c66665c7e009b9f533bdf6f.townsourced.com']);
+    _paq.push(['setSiteId', 2]);
+    _paq.push(['setApiToken', 'E80SMnaO8kFL-gyxQRvLEUTUOCv6zi3R63VALxf64ft']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://5plhgbtl6we7tvxqeqt1.townsourced.com/embed.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+
+
+
+    
+
+	<script type="text/javascript">
+		
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
+</body>
+</html> 
