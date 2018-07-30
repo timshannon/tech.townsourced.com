@@ -1,7 +1,7 @@
 ---
 title: "When Naming Is Important, and When It's Not"
-draft: true
-date: "2018-07-27 09:17:00"
+draft: false
+date: "2018-07-30 09:17:00"
 categories: 
   - Development
 tags: 
