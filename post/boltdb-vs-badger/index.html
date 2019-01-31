@@ -146,6 +146,10 @@ comparing these two databases.  Dgraph have already done an
 <a href="https://blog.dgraph.io/post/badger-lmdb-boltdb/">excellent comparison of performance</a> between these two libraries. This
 post instead will focus on comparing criteria <em>other</em> than performance.</p>
 
+<p>Manish Jain from Dgraph has also been kind
+enough to <a href="https://github.com/dgraph-io/badger/pull/704#issuecomment-459037069">offer some responses</a> to my limited perspectives
+in my comparisons below.  I&rsquo;ve included them in-line.</p>
+
 <h1 id="superficial-differences">Superficial Differences</h1>
 
 <p>When I first approached writing BadgerHold, I was already familiar with BoltDB and had used it on several other projects.
@@ -168,9 +172,15 @@ opts.ValueDir = &quot;/tmp/badger&quot;
 db, err := badger.Open(opts)
 </code></pre>
 
-<p>This is due to the nature of LSM-tree databases, where multiple levels are stored across multiple files.  I&rsquo;m hard
-pressed to come up with a <em>legitimate</em> reason why a single file would matter over a directory of files, but I must admit,
-<em>with all other things being equal</em>, I&rsquo;d prefer to manage an embedded database in a single file.</p>
+<p>This is due to the nature of LSM-tree databases, where multiple levels are stored across multiple files.  I was hard
+pressed to come up with a <em>legitimate</em> reason why a single file would matter over a directory of files, but Manish
+explained the reasoning behind the choice.</p>
+
+<blockquote>
+<p>The benefit of having files be immutable is that they get rsync friendly. That was an explicit requirement for LevelDB at Google.</p>
+
+<p>&ndash; <cite>Manish Jain</cite></p>
+</blockquote>
 
 <h2 id="unexpected-api-choices">Unexpected API Choices</h2>
 
@@ -194,6 +204,12 @@ opts.Dir = &quot;/tmp/badger&quot;
 opts.ValueDir = &quot;/tmp/badger&quot;
 db, err := badger.Open(opts)
 </code></pre>
+
+<blockquote>
+<p>That&rsquo;s intended. It allows flexibility in how you want Badger to behave, and we want users to have a look at the default options and tweak them.</p>
+
+<p>&ndash; <cite>Manish Jain</cite></p>
+</blockquote>
 
 <p>In the standard Go library, constants and enumerations are usually stored within the same package where they are used,
 or local enumerations defined from external packages exported enumerations (see
@@ -251,7 +267,8 @@ query from within that same transaction.</p>
 </code></pre>
 
 <p>This type of query is much harder to implement in Badger for <code>Update</code> and <code>Delete</code> queries than in BoltDB due to this
-single iterator limit from within R/W transactions.</p>
+single iterator limit from within R/W transactions.  I&rsquo;ve since
+<a href="https://github.com/dgraph-io/badger/issues/705">opened an issue</a>, as this limitation may be fixable.</p>
 
 <h2 id="memory-usage">Memory Usage</h2>
 
