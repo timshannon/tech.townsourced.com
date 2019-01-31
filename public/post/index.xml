@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 30 Jul 2018 10:12:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 29 Jan 2019 19:36:00 +0000</lastBuildDate>
     
 	<atom:link href="https://tech.townsourced.com/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>BoltDB vs Badger: A Comparison of Go Key-Value databases</title>
+      <link>https://tech.townsourced.com/post/boltdb-vs-badger/</link>
+      <pubDate>Tue, 29 Jan 2019 19:36:00 +0000</pubDate>
+      
+      <guid>https://tech.townsourced.com/post/boltdb-vs-badger/</guid>
+      <description>When I first started working on BoltHold (a simple querying and index engine that sits on top of BoltDB), Badger didn&amp;rsquo;t yet exist, and BoltDB was the clear leader of the pack for key-value, pure-go, embeddable databases.
+Then Badger was released, and it was shown to be more than just a pure-go version of LSM-tree stores like RocksDB / LevelDB, it actually was faster than RocksDB. Much faster. I knew I wanted to build something with Badger in the future, and when a issue was opened to add Badger support to Bolthold, I jumped on it.</description>
+    </item>
     
     <item>
       <title>When Naming Is Important, and When It&#39;s Not</title>

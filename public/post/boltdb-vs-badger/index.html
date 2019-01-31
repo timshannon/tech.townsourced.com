@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+  
+  
+ <html lang="en">   
+<head>
+
+    <title>BoltDB vs Badger: A Comparison of Go Key-Value databases</title>
+
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<meta name="author" content="Tim Shannon at solutions.townsourced.com">    
+
+<meta name="keywords" content="contractor,freelancer,Minnesota,st paul,independent contractor,independent freelancer,development studio,go, golang, development, programming, projects, boltdb, bolt, badger, badgerdb, bolthold, badgerhold, KV store, comparison, nosql, no-sql, database, embedded, boltdb vs badger, lmdb, ">
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content=""/>
+<meta property="og:title" content="BoltDB vs Badger: A Comparison of Go Key-Value databases : tech.townsourced.com"/>
+<meta property="og:site_name" content="Townsourced Tech Blog"/>
+
+<meta property="og:url" content="https://tech.townsourced.com/post/boltdb-vs-badger/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-01-29"/>
+<meta property="article:modified_time" content="2019-01-29"/>
+
+
+
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="development">
+<meta property="article:tag" content="programming">
+<meta property="article:tag" content="projects">
+<meta property="article:tag" content="boltdb">
+<meta property="article:tag" content="bolt">
+<meta property="article:tag" content="badger">
+<meta property="article:tag" content="badgerdb">
+<meta property="article:tag" content="bolthold">
+<meta property="article:tag" content="badgerhold">
+<meta property="article:tag" content="KV store">
+<meta property="article:tag" content="comparison">
+<meta property="article:tag" content="nosql">
+<meta property="article:tag" content="no-sql">
+<meta property="article:tag" content="database">
+<meta property="article:tag" content="embedded">
+<meta property="article:tag" content="boltdb vs badger">
+<meta property="article:tag" content="lmdb">
+
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:site" content="@townsourced">
+<meta name="twitter:title" content="BoltDB vs Badger: A Comparison of Go Key-Value databases : tech.townsourced.com">
+<meta name="twitter:creator" content="@shannontimothy">
+<meta name="twitter:description" content="">
+
+<meta name="twitter:domain" content="townsourced.com">
+
+
+
+    <link rel="canonical" href="https://tech.townsourced.com/post/boltdb-vs-badger/">
+    
+    <link rel="shortcut icon" href="https://tech.townsourced.com/favicon.ico">  
+    <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/prism.css">
+    <link rel="stylesheet" href="https://tech.townsourced.com/css/main.css">
+
+    
+    
+    
+</head> 
+
+
+<body>
+   
+	  
+<header class="header">
+		<div class="container">                       
+				<div class="profile-content pull-left">
+						<h1 class="name">Townsourced Tech Blog</h1>
+						<h2 class="desc">Tech musings from a <a href="https://solutions.townsourced.com">local development agency</a></h2>   
+						<ul class="social list-inline">
+								<li><a id="homeLink" href="https://tech.townsourced.com/"><i class="fa fa-home"></i></a></li>                  
+								<li><a href="https://github.com/timshannon/"><i class="fa fa-github-alt"></i></a></li>                  
+								<li><a href="https://twitter.com/townsourced"><i class="fa fa-twitter"></i></a></li>                   
+								<li><a href="https://www.facebook.com/townsourced"><i class="fa fa-facebook"></i></a></li>
+								<li class="last-item"><a href="https://tech.townsourced.com/index.xml"><i class="fa fa-rss"></i></a></li>                 
+						</ul> 
+				</div>
+		</div>
+</header>
+    
+
+
+    <div class="container sections-wrapper">
+        <div class="row">
+            <div class="primary col-md-8 col-sm-12 col-xs-12">
+								<section class="section post">
+                    <div class="section-inner">
+                        <h2 class="heading title">BoltDB vs Badger: A Comparison of Go Key-Value databases
+													<div class="post-meta">
+														<ul class="list-inline">
+															<li class="date" title="Post date"><i class="fa fa-calendar"></i> Tuesday, Jan 29, 2019</li>
+															<li class="author" title="Author"><i class="fa fa-user"></i> 	Tim Shannon</li>
+															<li class="timer" title="Estimate reading time"><i class="fa fa-clock-o"></i> 7 min</li>
+															<li class="comments"><i class="fa fa-comments"></i>
+																<a href="https://tech.townsourced.com/post/boltdb-vs-badger/#disqus_thread">0 comments</a>
+															</li>
+														</ul>
+													</div>
+												</h2>
+                        <div class="content">
+													
+
+<p>When I first started working on <a href="https://github.com/timshannon/bolthold">BoltHold</a> (<em>a simple querying and index engine
+that sits on top of BoltDB</em>), <a href="https://github.com/dgraph-io/badger">Badger</a> didn&rsquo;t yet exist, and
+<a href="https://github.com/etcd-io/bbolt">BoltDB</a> was the clear leader of the pack for key-value, pure-go, embeddable databases.</p>
+
+<p>Then Badger was released, and it was shown to be more than just a pure-go version of LSM-tree stores like RocksDB /
+LevelDB, it actually was <em>faster</em> than RocksDB.  <strong><a href="https://blog.dgraph.io/post/badger/">Much faster</a></strong>.  I knew I
+wanted to build something with Badger in the future, and when a issue was opened to
+<a href="https://github.com/timshannon/bolthold/issues/41">add Badger support to Bolthold</a>, I jumped on it.</p>
+
+<p>The first thing I had to consider in adding Badger support was whether I wanted to add Badger as another dependency and allow
+users to switch between the two via a configuration flag, or build an entirely separate library.  I end up following
+the Go proverb:</p>
+
+<blockquote>
+<p>A little copying is better than a little dependency</p>
+</blockquote>
+
+<p>I decided to make BadgerHold a separate library, and now that I have 88% test coverage using the exact same tests as BoltHold,
+I believe that I made the right choice.</p>
+
+<p>In implementing the exact same library on two different KV stores, I like to think I have gained some perspective on
+comparing these two databases.  Dgraph have already done an
+<a href="https://blog.dgraph.io/post/badger-lmdb-boltdb/">excellent comparison of performance</a> between these two libraries. This
+post instead will focus on comparing criteria <em>other</em> than performance.</p>
+
+<h1 id="superficial-differences">Superficial Differences</h1>
+
+<p>When I first approached writing BadgerHold, I was already familiar with BoltDB and had used it on several other projects.
+Unfortunately, this meant that the onus was on Badger to meet or conflict with my expectations upon first using the library.
+With that in mind, I found the following differences to be superficial, and not a major impact in my usage of both libraries.
+That being said, I felt I should list them in case they prove to be more important to you.</p>
+
+<h2 id="file-handling">File Handling</h2>
+
+<p>With BoltDB, you open a database by specifying a file, and passing in some options:</p>
+
+<pre><code class="language-go">db, err := bolt.Open(&quot;my.db&quot;, 0600, options)
+</code></pre>
+
+<p>Badger, on the other hand, requires you to specify a multiple folders as part of an options struct instead of a single file:</p>
+
+<pre><code class="language-go">opts := badger.DefaultOptions
+opts.Dir = &quot;/tmp/badger&quot;
+opts.ValueDir = &quot;/tmp/badger&quot;
+db, err := badger.Open(opts)
+</code></pre>
+
+<p>This is due to the nature of LSM-tree databases, where multiple levels are stored across multiple files.  I&rsquo;m hard
+pressed to come up with a <em>legitimate</em> reason why a single file would matter over a directory of files, but I must admit,
+<em>with all other things being equal</em>, I&rsquo;d prefer to manage an embedded database in a single file.</p>
+
+<h2 id="unexpected-api-choices">Unexpected API Choices</h2>
+
+<p>In general I found BoltDB to fall more in line with what I would expect from a Go API compared to Badger. My expectations
+being defined by those that I am used to seeing in the Go standard library.</p>
+
+<p>For example, a common way to handle options in the Go standard library is to default values if not specified (see
+<a href="https://golang.org/pkg/net/http/#Server">http.Server</a>, and <a href="https://golang.org/pkg/database/sql/#Conn.BeginTx">sql.Conn</a>).</p>
+
+<p>Bolt&rsquo;s <code>Open</code> method will accept a nil option and open up the data file with defaults.</p>
+
+<pre><code class="language-go">db, err := bolt.Open(&quot;my.db&quot;, 0600, nil)
+</code></pre>
+
+<p>Badger&rsquo;s option argument doesn&rsquo;t accept a pointer, so a struct needs to be passed in.  If you want to use the default
+options, you need to make a copy of an exported struct that contains defaults.  Furthermore, you&rsquo;ll <em>always</em> need to
+change those defaults because the data directories are stored in the options type.</p>
+
+<pre><code class="language-go">opts := badger.DefaultOptions
+opts.Dir = &quot;/tmp/badger&quot;
+opts.ValueDir = &quot;/tmp/badger&quot;
+db, err := badger.Open(opts)
+</code></pre>
+
+<p>In the standard Go library, constants and enumerations are usually stored within the same package where they are used,
+or local enumerations defined from external packages exported enumerations (see
+<a href="https://golang.org/pkg/compress/gzip/#pkg-constants">gzip</a> and <a href="https://golang.org/pkg/os/#pkg-constants">os</a>).</p>
+
+<p>Badger requires you to import the <a href="https://godoc.org/github.com/dgraph-io/badger/options">badger/options</a> package to
+get the enumerations for <code>FileLoadingMode</code>.</p>
+
+<h1 id="behavior-differences">Behavior Differences</h1>
+
+<p>The following are more significant differences between how BoltDB and Badger behave.</p>
+
+<h2 id="buckets">Buckets</h2>
+
+<p>BoltDB has a concept of <a href="https://godoc.org/github.com/etcd-io/bbolt#Bucket">buckets</a> in a single database. Comparable
+to tables in a relational database, this allows you to store different types of data in the same database, and not
+worry about row conflicts.</p>
+
+<p>In BoltHold, I used different buckets to store different types.  Since Badger doesn&rsquo;t have similar functionality, I
+had to replicate it by prefixing keys with the type being stored, after which I could use Badger&rsquo;s
+<a href="https://godoc.org/github.com/dgraph-io/badger#Iterator.ValidForPrefix">ValidForPrefix</a> method when iterating to make
+sure queries only apply to the proper type. This allows the behavior between BoltHold and BadgerHold to be the same when
+storing different types in the same database. BoltDB most likely does something similar to create it&rsquo;s bucket functionality,
+but it&rsquo;s nice not to have to re-implement it.</p>
+
+<h2 id="iterators">Iterators</h2>
+
+<p>BoltDB allows you to create a number of Cursors on any given transaction.  Badger, on the other hand, only allows  one
+iterator at a time in Read / Write transactions.</p>
+
+<p>In BoltHold and BadgerHold, you have the ability to write subqueries, which allow you to filter records based on another
+query from within that same transaction.</p>
+
+<pre><code class="language-go">bh.Where(&quot;Name&quot;).MatchFunc(func(ra *bh.RecordAccess) (bool, error) {
+	// find where name exists in more than one category
+	record, ok := ra.Record().(*ItemTest)
+	if !ok {
+		return false, fmt.Errorf(&quot;Record is not ItemTest, it's a %T&quot;, ra.Record())
+	}
+
+	var result []ItemTest
+
+	err := ra.SubQuery(&amp;result,
+		bh.Where(&quot;Name&quot;).Eq(record.Name).And(&quot;Category&quot;).Ne(record.Category))
+	if err != nil {
+		return false, err
+	}
+
+	if len(result) &gt; 0 {
+		return true, nil
+	}
+
+	return false, nil
+})
+</code></pre>
+
+<p>This type of query is much harder to implement in Badger for <code>Update</code> and <code>Delete</code> queries than in BoltDB due to this
+single iterator limit from within R/W transactions.</p>
+
+<h2 id="memory-usage">Memory Usage</h2>
+
+<p>The single most surprising difference for me between BoltDB and Badger, was the disparity in memory usage.  In my testing
+I found Badger to use significantly more memory than BoltDB.  So much so that  I had to rewrite my tests from using a
+separate database for each test to using a single shared database for all tests.  My 8GB VM that I ran tests on would
+fail to complete due to running out of memory every single time, even after changing all of Badger&rsquo;s options to their
+lowest memory settings.</p>
+
+<p>To be fair, this is most likely by design, and the source of a lot of the impressive performance differences between BoltDB
+and Badger. There are many scenarios where this trade off is well worth the cost, however, I was personally surprised by
+it, as I hadn&rsquo;t seen it mentioned in any of the documentation or blog posts.</p>
+
+<h1 id="summary">Summary</h1>
+
+<table>
+<thead>
+<tr>
+<th><em>Criteria</em></th>
+<th>BoltDB</th>
+<th>Badger</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="#file-handling">File Handling</a></td>
+<td>Single File</td>
+<td>Multiple Directories</td>
+</tr>
+
+<tr>
+<td><a href="#unexpected-api-choices">API</a></td>
+<td>Idiomatic</td>
+<td>Unexpected</td>
+</tr>
+
+<tr>
+<td><a href="#buckets">Bucket Support</a></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td><a href="#iterators">Iterators</a></td>
+<td>No Restrictions</td>
+<td>One R/W iterator at a time</td>
+</tr>
+
+<tr>
+<td><a href="#memory-usage">Memory Usage</a></td>
+<td>Low</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
+
+<p>The biggest differences between BoltDB and Badger, stem from their underlying technologies, and not their implementation
+details.  If you are picking one over the other based solely on performance metrics, I would closely consider your
+usage case instead.</p>
+
+<p>My recommendation would be to use BoltDB for scenarios where you are more memory constrained or where the performance
+gain isn&rsquo;t worth the cost in memory usage.  Examples of this may be projects on mobile phones, tablets, Raspberry
+Pi-like devices or command line applications where you need some persistent storage.</p>
+
+<p>For micro-services and projects you&rsquo;d tend to run on a server where more memory is available, or projects where you expect
+a lot of writes like for logging, I would recommend Badger.</p>
+
+<p>If you choose to use <a href="https://github.com/timshannon/bolthold">BoltHold</a>, or
+<a href="https://github.com/timshannon/badgerhold">BadgerHold</a>, I would recommend aliasing the package import as <code>bh</code> and since
+both library&rsquo;s APIs are nearly identical, you could easily switch your project from one to another if you
+find that one library will work better for you.</p>
+
+<pre><code class="language-go">import (
+	bh &quot;github.com/timshannon/badgerhold&quot;
+)
+
+// this code will run the same on BoltHold and BadgerHold
+
+store.UpdateMatching(&amp;Person{}, bh.Where(&quot;Death&quot;).Lt(bh.Field(&quot;Birth&quot;)), func(record interface{}) error {
+	update, ok := record.(*Person)
+	if !ok {
+		return fmt.Errorf(&quot;Record isn't the correct type!  Wanted Person, got %T&quot;, record)
+	}
+
+	update.Birth, update.Death = update.Death, update.Birth
+
+	return nil
+})
+</code></pre>
+
+												</div>
+												<hr>
+												<div class="content-footer">
+													<span class="pull-left">Posted under: 
+															
+																<span>
+																	<a href="https://tech.townsourced.com/tags/development">
+																		<a href="https://tech.townsourced.com/categories/development">Development</a>
+																	</a>
+																</span>
+															
+													</span>
+
+													<ul class="list-inline tags text-right">
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/development">
+																	<span class="label label-theme">#Development</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/go">
+																	<span class="label label-theme">#Go</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/programming">
+																	<span class="label label-theme">#programming</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/project">
+																	<span class="label label-theme">#project</span>
+																</a>
+															</li>
+														
+															<li>
+																<a href="https://tech.townsourced.com/tags/database">
+																	<span class="label label-theme">#database</span>
+																</a>
+															</li>
+														
+													</ul>
+												</div>
+												<hr>
+												<div id="comments">
+													<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "techtownsourcedcom" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+												</div>
+                    </div>                 
+									</section>
+                
+            </div>
+						<div class="secondary col-md-4 col-sm-12 col-xs-12">
+		 <aside class="info aside section">
+				<div class="section-inner">
+						<h2 class="heading">About</h2>
+						<div class="content">
+							<p>We are a small development and design team based in Minnesota. We specialize in beautiful, performant and scalable applications.</p>
+							<ul class="list-unstyled">
+									<li><i class="fa fa-map-marker"></i><span class="sr-only">Location:</span>Minnesota</li>
+									<li><i class="fa fa-envelope-o"></i><span class="sr-only">Email:</span><a href="mailto:solutions@townsourced.com">solutions@townsourced.com</a></li>
+									<li><i class="fa fa-link"></i><span class="sr-only">Website:</span><a href="https://solutions.townsourced.com">https://solutions.townsourced.com</a></li>
+							</ul>
+						</div>  
+				</div>                 
+		</aside>
+
+		<aside class="categories aside section">
+			<div class="section-inner">
+				<h2 class="heading">Categories and Tags</h2>
+				<div class="content">
+					<ul class="list-unstyled">
+						
+							<li>
+								<a href="https://tech.townsourced.com/categories/development">development</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/categories/releases">releases</a>
+							</li>
+						
+					</ul>
+					<hr>
+					<ul class="list-inline tags">
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/authentication">
+									<span class="label label-theme">#authentication</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/continuous-integration">
+									<span class="label label-theme">#continuous-integration</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/database">
+									<span class="label label-theme">#database</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/development">
+									<span class="label label-theme">#development</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/go">
+									<span class="label label-theme">#go</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/lex-library">
+									<span class="label label-theme">#lex-library</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/programming">
+									<span class="label label-theme">#programming</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/project">
+									<span class="label label-theme">#project</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/reference">
+									<span class="label label-theme">#reference</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/standards">
+									<span class="label label-theme">#standards</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/townsourced">
+									<span class="label label-theme">#townsourced</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/tutorial">
+									<span class="label label-theme">#tutorial</span>
+								</a>
+							</li>
+						
+							<li>
+								<a href="https://tech.townsourced.com/tags/web-development">
+									<span class="label label-theme">#web-development</span>
+								</a>
+							</li>
+						
+					</ul>
+
+				</div>
+			</div>
+		</aside>
+		
+		<aside class="projects aside section">
+				<div class="section-inner">
+						<h2 class="heading">Projects</h2>
+						<div class="content">
+								<p class="intro">Open source software plays an important role at Townsourced.  We believe the strongest and most secure solutions are built in the open.</p>
+								<div class="content">		
+
+									<div class="item">
+										<h3 class="title"><a href="https://github.com/lexlibrary/lexlibrary" target="_blank"><i class="fa fa-external-link"></i>Lex Library</a></h3>
+										<p class="description">
+											An open source documentation repository with modern features, like importing from a wide variety of documentation files and web sites, and natural language processing.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="https://www.townsourced.com" target="_blank"><i class="fa fa-external-link"></i>Townsourced</a></h3>
+										<p class="description">
+											A locally moderated community bulletin board, built to help communities discover events, share, shop and sell locally.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title"><a href="http://tshannon.bitbucket.org/freehold/" target="_blank"><i class="fa fa-external-link"></i>Freehold</a></h3>
+										<p class="description">
+											An open, secure, and lightweight platform for your files and data.
+										</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/bolthold" target="_blank"><i class="fa fa-external-link"></i>Bolthold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on BoltDB.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/badgerhold" target="_blank"><i class="fa fa-external-link"></i>BadgerHold</a>
+										</h3>
+										<p class="description">An embeddable NoSQL store for Go types built on Badger.</p>
+									</div>
+
+									<div class="item">
+										<h3 class="title">
+											<a href="https://github.com/timshannon/ironsmith" target="_blank"><i class="fa fa-external-link"></i>Ironsmith</a>
+										</h3>
+										<p class="description">A simple, script-driven continuous integration tool, with no external dependencies.</p>
+									</div>
+
+									<p><a class="more-link" target="_blank" href="https://solutions.townsourced.com">
+										<i class="fa fa-external-link"></i> More at solutions.townsourced.com </a>
+									</p> 
+								</div>              
+						</div>  
+				</div>                 
+		</aside>
+</div>
+
+					</div>
+    </div>
+	 
+<footer class="footer">
+		<div class="container text-center">
+						<small class="copyright">
+							<div>© <a href="https://solutions.townsourced.com" target="_blank">Townsourced</a>  - design modified from template by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a></div>
+							<div>
+						Unless otherwise noted, content is released under a  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</div>
+						</small>
+		</div>
+</footer>
+
+<script type="text/javascript" src="https://tech.townsourced.com/js/prism.js"></script>            
+
+
+<script id="dsq-count-scr" src="//techtownsourcedcom.disqus.com/count.js" async></script>
+
+
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    _paq.push(['setTrackerUrl',  'https://api-e68fcf7f9c66665c7e009b9f533bdf6f.townsourced.com']);
+    _paq.push(['setSiteId', 2]);
+    _paq.push(['setApiToken', 'E80SMnaO8kFL-gyxQRvLEUTUOCv6zi3R63VALxf64ft']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://5plhgbtl6we7tvxqeqt1.townsourced.com/embed.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+
+
+
+    
+
+	<script type="text/javascript">
+		
+		DISQUSWIDGETS.getCount({reset: true});
+	</script>
+</body>
+</html> 
