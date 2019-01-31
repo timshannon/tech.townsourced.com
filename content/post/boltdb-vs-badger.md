@@ -1,7 +1,7 @@
 ---
 title: "BoltDB vs Badger: A Comparison of Go Key-Value databases"
-draft: true
-date: "2019-01-27 18:00:00"
+draft: false
+date: "2019-01-29 19:36:00"
 categories: 
   - Development
 tags: 
