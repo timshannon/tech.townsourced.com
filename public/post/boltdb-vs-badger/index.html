@@ -127,11 +127,11 @@ that sits on top of BoltDB</em>), <a href="https://github.com/dgraph-io/badger">
 
 <p>Then Badger was released, and it was shown to be more than just a pure-go version of LSM-tree stores like RocksDB /
 LevelDB, it actually was <em>faster</em> than RocksDB.  <strong><a href="https://blog.dgraph.io/post/badger/">Much faster</a></strong>.  I knew I
-wanted to build something with Badger in the future, and when a issue was opened to
+wanted to build something with Badger in the future, and when an issue was opened to
 <a href="https://github.com/timshannon/bolthold/issues/41">add Badger support to Bolthold</a>, I jumped on it.</p>
 
 <p>The first thing I had to consider in adding Badger support was whether I wanted to add Badger as another dependency and allow
-users to switch between the two via a configuration flag, or build an entirely separate library.  I end up following
+users to switch between the two via a configuration flag, or build an entirely separate library.  I ended up following
 the Go proverb:</p>
 
 <blockquote>
@@ -256,14 +256,14 @@ single iterator limit from within R/W transactions.</p>
 <h2 id="memory-usage">Memory Usage</h2>
 
 <p>The single most surprising difference for me between BoltDB and Badger, was the disparity in memory usage.  In my testing
-I found Badger to use significantly more memory than BoltDB.  So much so that  I had to rewrite my tests from using a
-separate database for each test to using a single shared database for all tests.  My 8GB VM that I ran tests on would
-fail to complete due to running out of memory every single time, even after changing all of Badger&rsquo;s options to their
-lowest memory settings.</p>
+I found Badger to use significantly more memory than BoltDB.  So much so that  I had to rewrite my BadgerHold tests from using a
+separate database for each test to using a single shared database for all tests.  I couldn&rsquo;t complete the entire suite
+of tests on my 8GB VM due to out of memory errors. Even after changing all of Badger&rsquo;s options to their
+<a href="https://github.com/dgraph-io/badger#memory-usage">lowest memory settings</a>, I was unable to get the full suite to finish.</p>
 
 <p>To be fair, this is most likely by design, and the source of a lot of the impressive performance differences between BoltDB
-and Badger. There are many scenarios where this trade off is well worth the cost, however, I was personally surprised by
-it, as I hadn&rsquo;t seen it mentioned in any of the documentation or blog posts.</p>
+and Badger. There are many scenarios where this trade off of memory for speed is well worth the cost, however, I was
+personally surprised by the extent of it, as I hadn&rsquo;t seen it mentioned in any of the documentation or blog posts.</p>
 
 <h1 id="summary">Summary</h1>
 
