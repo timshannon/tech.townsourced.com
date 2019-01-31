@@ -256,14 +256,16 @@ single iterator limit from within R/W transactions.</p>
 <h2 id="memory-usage">Memory Usage</h2>
 
 <p>The single most surprising difference for me between BoltDB and Badger, was the disparity in memory usage.  In my testing
-I found Badger to use significantly more memory than BoltDB.  So much so that  I had to rewrite my BadgerHold tests from using a
+I found Badger to use <em>significantly</em> more memory than BoltDB.  So much so that  I had to rewrite my BadgerHold tests from using a
 separate database for each test to using a single shared database for all tests.  I couldn&rsquo;t complete the entire suite
 of tests on my 8GB VM due to out of memory errors. Even after changing all of Badger&rsquo;s options to their
 <a href="https://github.com/dgraph-io/badger#memory-usage">lowest memory settings</a>, I was unable to get the full suite to finish.</p>
 
 <p>To be fair, this is most likely by design, and the source of a lot of the impressive performance differences between BoltDB
-and Badger. There are many scenarios where this trade off of memory for speed is well worth the cost, however, I was
-personally surprised by the extent of it, as I hadn&rsquo;t seen it mentioned in any of the documentation or blog posts.</p>
+and Badger. The memory usage was also exasperated by opening multiple databases, which meant there needed to be enough
+memory for each of those database&rsquo;s buffer cache. There are many scenarios where this trade off of memory for speed is
+well worth the cost, however, I was personally surprised by the extent of it, as I hadn&rsquo;t seen it mentioned in any of
+the documentation or blog posts.</p>
 
 <h1 id="summary">Summary</h1>
 
@@ -319,6 +321,10 @@ Pi-like devices or command line applications where you need some persistent stor
 
 <p>For micro-services and projects you&rsquo;d tend to run on a server where more memory is available, or projects where you expect
 a lot of writes like for logging, I would recommend Badger.</p>
+
+<p>I would also recommend using one shared Badger database, rather then opening multiple separate databases to limit your
+memory usage.  Using a library like BadgerHold, or using similar key-prefixing methods in your own code, should allow
+you to manage your data types separately within the same database.</p>
 
 <p>If you choose to use <a href="https://github.com/timshannon/bolthold">BoltHold</a>, or
 <a href="https://github.com/timshannon/badgerhold">BadgerHold</a>, I would recommend aliasing the package import as <code>bh</code> and since
